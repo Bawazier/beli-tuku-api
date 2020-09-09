@@ -108,4 +108,28 @@ app.get('/items', (req, res) => {
             console.log(err);
         }
     });
+});
+
+app.put('/items/:id', (req, res) => {
+    const {name, price, description} = req.body;
+    let {id} = req.params;
+    if(name && price && description){
+        db.query(`UPDATE items SET name = '${name}', price = ${price}, description = '${description}' WHERE id = ${id}`,
+        (err, respone, fields) => {
+            if(!err){
+                res.send({
+                    success: true,
+                    message: 'Updated Success',
+                    data: respone
+                });
+            }else{
+                res.send({
+                    success: false,
+                    message: 'Updated Failled'
+                });
+            }
+        });
+    }else{
+        res.send("Data you must be true");
+    }
 })
