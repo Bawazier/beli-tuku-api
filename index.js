@@ -149,5 +149,23 @@ app.delete('/items/:id', (req, res) => {
                 message: 'Deleted Failled'
             });
         }
-    })
+    });
+});
+
+app.get('/items/:id', (req, res) => {
+    let {id} = req.params;
+    db.query(`SELECT * FROM items WHERE id = ${id}`, (err, respone, fields) => {
+        if(!err){
+            res.send({
+                success: true,
+                message: 'SELECT BY ID SUCCESS',
+                data: respone
+            });
+        }else{
+            res.send({
+                success: false,
+                message: 'SELECT BY ID FAILLED'
+            });
+        }
+    });
 })
