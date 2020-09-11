@@ -38,7 +38,7 @@ app.post('/items', (req, res) => {
 });
 
 app.get('/items', (req, res) => {
-	let { page, limit, search } = req.query;
+	let { page=1, limit=5, search, sortBy='id', sort='ASC' } = req.query;
 	let searchKey = '';
 	let searchValue = '';
 	if (typeof (search) === 'object') {
@@ -49,22 +49,10 @@ app.get('/items', (req, res) => {
 		searchValue = search || '';
 	}
 
-	if (!limit) {
-		limit = 5;
-	} else {
-		limit = parseInt(limit);
-	}
-
-	if (!page) {
-		page = 1;
-	} else {
-		page = parseInt(page);
-	}
-
 	const offset = (page - 1) * limit;
 
 	db.query(`SELECT * FROM items WHERE ${searchKey} LIKE '%${searchValue}%' 
-    LIMIT ${limit} OFFSET ${offset}`, (err, results, _fields) => {
+	ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`, (err, results, _fields) => {
 		if (!err) {
 			const pageInfo = {
 				count: 0,
