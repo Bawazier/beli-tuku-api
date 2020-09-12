@@ -66,5 +66,32 @@ module.exports = {
 				}
 			}
 		});
+	},
+
+	update: (req, res) => {
+		if (!req.body) {
+			res.status(400).send({
+				message: 'Content can not be empty!',
+			});
+		}
+
+		const category = {
+			name: req.body.name
+		};
+
+		Category.update(category, req.params.id, (err, data) => {
+			if (!err) {
+				res.send({
+					success: true,
+					message: 'Updated Success',
+					data: data
+				});
+			} else {
+				res.send({
+					success: false,
+					message: 'Updated Failled'
+				});
+			}
+		});
 	}
 };
