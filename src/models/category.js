@@ -43,7 +43,25 @@ Category.findById = (id, result) => {
 Category.update = (category, id, result) => {
 	db.query(`UPDATE ${tableName} SET name=? WHERE id=?`, [category.name, id], (err, res) => {
 		if(!err){
-			result(null, res);
+			if(res.length){
+				result(null, res);
+			}else{
+				result({ kind: 'not_found' }, null);
+			}
+		}else{
+			result(err, null);
+		}
+	});
+};
+
+Category.delete = (id, result) => {
+	db.query(`DELETE FROM ${tableName} WHERE id=?`, [id], (err, res) => {
+		if(!err){
+			if(res.length){
+				result(null, res);
+			}else{
+				result({ kind: 'not_found' }, null);
+			}
 		}else{
 			result(err, null);
 		}
