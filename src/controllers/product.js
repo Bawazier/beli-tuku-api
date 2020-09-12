@@ -45,11 +45,11 @@ module.exports = {
 			} else {
 				if (err.kind === 'not_found') {
 					res.status(404).send({
-						message: `Not found member with id ${req.params.id}.`,
+						message: `Not found Product with id ${req.params.id}.`,
 					});
 				} else {
 					res.status(500).send({
-						message: 'Error retrieving Customer with id ' + req.params.id,
+						message: 'Error retrieving Product with id ' + req.params.id,
 					});
 				}
 			}
@@ -66,7 +66,7 @@ module.exports = {
 				});
 			} else {
 				res.status(500).send({
-					message: 'Error retrieving Customer with id ' + req.params.id,
+					message: 'Error retrieving Product with id ' + req.params.id,
 				});
 			}
 		});
@@ -98,6 +98,28 @@ module.exports = {
 					success: false,
 					message: 'Updated Failled'
 				});
+			}
+		});
+	},
+
+	deleteById: (req, res) => {
+		Product.deleteById(req.params.id, (err, data) => {
+			if(!err){
+				res.status(201).send({
+					success: true,
+					message: `Delete ${req.params.id} Success`,
+					data: data
+				});
+			}else{
+				if (err.kind === 'not_found') {
+					res.status(404).send({
+						message: `Not found Product with id ${req.params.id}.`,
+					});
+				} else {
+					res.status(500).send({
+						message: 'Error retrieving Product with id ' + req.params.id,
+					});
+				}
 			}
 		});
 	}
