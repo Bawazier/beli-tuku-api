@@ -9,6 +9,8 @@ app.listen(5000, () => {
 });
 
 const productRouter = require('./src/routes/product');
+const categoryRouter = require('./src/routes/category');
 
 // attach member router
 app.use('/product', productRouter);
+app.use('/category', categoryRouter);
