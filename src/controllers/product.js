@@ -55,4 +55,20 @@ module.exports = {
 			}
 		});
 	},
+
+	findAll: (req, res) => {
+		Product.findAll((err, data) => {
+			if (!err) {
+				res.status(201).send({
+					success: true,
+					message: 'SELECT BY ID SUCCESS',
+					data: data
+				});
+			} else {
+				res.status(500).send({
+					message: 'Error retrieving Customer with id ' + req.params.id,
+				});
+			}
+		});
+	},
 };

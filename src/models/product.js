@@ -14,7 +14,7 @@ const Product = function (product) {
 
 Product.create = (product, result)=>{
 	db.query(`INSERT INTO ${tableName} (name, price, created_at, updated_at, category_id, description)
-	VALUES (?,?,?,?,?)`, [product.name, product.price, product.created_at, product.updated_at, 
+	VALUES (?,?,?,?,?,?)`, [product.name, product.price, product.created_at, product.updated_at, 
 		product.categoryId, product.description], (err) => {
 		if(!err){
 			result(null, {...product});
@@ -32,6 +32,16 @@ Product.findById = (id, result) => {
 			}else{
 				result({ kind: 'not_found' }, null);
 			}
+		}else{
+			result(err, null);
+		}
+	});
+};
+
+Product.findAll = (result) =>{
+	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
+		if(!err){
+			result(null, res);
 		}else{
 			result(err, null);
 		}
