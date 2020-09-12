@@ -48,4 +48,16 @@ Product.findAll = (result) =>{
 	});
 };
 
+Product.updateAll = (product, id, result) => {
+	db.query(`UPDATE ${tableName} SET name=?, price=?, updated_at=?, category_id=?, description=? WHERE id=?`, 
+		[product.name, product.price, product.updated_at, product.categoryId, product.description, id], 
+		(err, res) => {
+			if(!err){
+				result(null, {...product});
+			}else{
+				result(err, null);
+			}
+		});
+};
+
 module.exports = Product;

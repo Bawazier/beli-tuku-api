@@ -61,7 +61,7 @@ module.exports = {
 			if (!err) {
 				res.status(201).send({
 					success: true,
-					message: 'SELECT BY ID SUCCESS',
+					message: 'SELECT ALL SUCCESS',
 					data: data
 				});
 			} else {
@@ -71,4 +71,34 @@ module.exports = {
 			}
 		});
 	},
+
+	updateAll: (req, res) => {
+		if (!req.body) {
+			res.status(400).send({
+				message: 'Content can not be empty!',
+			});
+		}
+		const product = new Product({
+			name: req.body.name,
+			price: req.body.price,
+			updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
+			categoryId: req.body.categoryId,
+			description: req.body.description
+		});
+		Product.updateAll(product, req.params.id, (err, data) => {
+			// if(product.name && product.price && product.updated_at, product.categoryId, product.description)
+			if (!err) {
+				res.send({
+					success: true,
+					message: 'Updated Success',
+					data: data
+				});
+			} else {
+				res.send({
+					success: false,
+					message: 'Updated Failled'
+				});
+			}
+		});
+	}
 };
