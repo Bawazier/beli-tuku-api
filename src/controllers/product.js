@@ -3,7 +3,7 @@ const Product = require('../models/product');
 const { format } = require('date-fns');
 
 module.exports = {
-	create: (req, res) =>{
+	create: (req, res) => {
 		if (!req.body) {
 			res.status(400).send({
 				message: 'Content can not be empty!',
@@ -12,16 +12,17 @@ module.exports = {
 		const product = new Product({
 			name: req.body.name,
 			price: req.body.price,
-			date: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
+			created_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
+			updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 			categoryId: req.body.categoryId,
 			description: req.body.description
 		});
-		Product.create(product, (err, data) => {
+		Product.create(product, (err) => {
 			if (!err) {
 				res.status(201).send({
 					success: true,
 					message: 'Insert Data Success',
-					data: req.body
+					data: { ...product }
 				});
 			} else {
 				console.log(err);
@@ -29,6 +30,28 @@ module.exports = {
 					success: false,
 					message: 'Insert Data Failled'
 				});
+			}
+		});
+	},
+
+	findById: (req, res) => {
+		Product.findById(req.params.id, (err, data) => {
+			if (!err) {
+				res.status(201).send({
+					success: true,
+					message: 'SELECT BY ID SUCCESS',
+					data: data
+				});
+			} else {
+				if (err.kind === 'not_found') {
+					res.status(404).send({
+						message: `Not found member with id ${req.params.id}.`,
+					});
+				} else {
+					res.status(500).send({
+						message: 'Error retrieving Customer with id ' + req.params.id,
+					});
+				}
 			}
 		});
 	},
