@@ -26,6 +26,18 @@ Category.findAll = (result) => {
 	});
 };
 
-
+Category.findById = (id, result) => {
+	db.query(`SELECT * FROM ${tableName} WHERE id=?`, [id], (err, res) => {
+		if(!err){
+			if(res.length){
+				result(null, res);
+			}else{
+				result({ kind: 'not_found' }, null);
+			}
+		}else{
+			result(err, null);
+		}
+	});
+};
 
 module.exports = Category;
