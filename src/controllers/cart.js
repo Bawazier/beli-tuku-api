@@ -6,16 +6,15 @@ module.exports = {
 		const cart = {
 			user_id: req.body.user_id,
 			product_id: req.body.product_id,
-			quantity: req.body.quantity,
-			totalPrice: req.body.totalPrice
+			quantity: req.body.quantity
 		};
 
-		if (!cart.user_id || !cart.product_id || !cart.quantity || !cart.totalPrice) {
+		if (!cart.user_id || !cart.product_id || !cart.quantity) {
 			res.status(400).send({
 				message: 'Content can not be empty!',
 			});
 		}else{
-			Cart.create(cart, (err, data) => {
+			Cart.create(cart, (err) => {
 				if (!err) {
 					res.status(201).send({
 						success: true,
@@ -23,31 +22,27 @@ module.exports = {
 						data: { ...cart }
 					});
 				} else {
-					console.log(err);
 					res.status(500).send({
 						success: false,
 						message: 'Insert Data Failled',
-						data: data
+						data: err
 					});
 				}
 			});		
 		}
 	},
 
-	updateAll: (req, res) => {
+	updateQuantity: (req, res) => {
 		const cart = {
-			user_id: req.body.user_id,
-			product_id: req.body.product_id,
-			quantity: req.body.quantity,
-			totalPrice: req.body.totalPrice,
+			quantity: req.body.quantity
 		};
 
-		if (!cart.user_id || !cart.product_id || !cart.quantity || !cart.totalPrice) {
+		if (!cart.quantity) {
 			res.status(400).send({
 				message: 'Content can not be empty!',
 			});
 		}else{
-			Cart.updateAll(cart, req.params.id, (err, data) => {
+			Cart.updateQuantity(cart, req.params.id, (err, data) => {
 				if (!err) {
 					res.status(201).send({
 						success: true,
