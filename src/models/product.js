@@ -38,12 +38,20 @@ Product.findById = (id, result) => {
 	});
 };
 
-Product.findAll = (result) =>{
-	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
+Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) =>{
+	db.query(`SELECT * FROM ${tableName} WHERE ${searchKey} LIKE '%${searchValue}%' 
+	ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`, (err, res) => {
 		if(!err){
-			result(null, res);
+			if(res.length){
+				db.query(`SELECT COUNT(*) AS count FROM ${tableName} WHERE ${searchKey} LIKE '%${searchValue}%'`, 
+					(err, data) => {
+						result(null, res, data);
+					});
+			}else{
+				result({ kind: 'not_found' }, null, null);
+			}
 		}else{
-			result(err, null);
+			result(err, null, null);
 		}
 	});
 };
