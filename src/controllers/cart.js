@@ -66,6 +66,38 @@ module.exports = {
 		}
 	},
 
+	updateById: (req, res) => {
+		if (!req.body) {
+			res.status(400).send({
+				message: 'Content can not be empty!',
+			});
+		}
+		const cart = Object.entries(req.body).map((item)=>{
+			return parseInt(item[1])>0?`${item[0]} =${item[1]}` : `${item[0]} ='${item[1]}'`;
+		});
+
+		Cart.updateById(cart, req.params.id, (err, data) => {
+			// if(cart.name && cart.price && cart.updated_at, cart.categoryId, cart.description)
+			if (!err) {
+				res.send({
+					success: true,
+					message: 'Updated Success',
+					data: data
+				});
+			} else {
+				if (err.kind === 'not_found') {
+					res.status(404).send({
+						message: `Not found Cart with id ${req.params.id}.`,
+					});
+				} else {
+					res.status(500).send({
+						message: 'Error retrieving Cart with id ' + req.params.id,
+					});
+				}
+			}
+		});
+	},
+
 	findById: (req, res) => {
 		Cart.findById(req.params.id, (err, data) => {
 			if (!err) {

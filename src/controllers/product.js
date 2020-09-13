@@ -102,6 +102,38 @@ module.exports = {
 		});
 	},
 
+	updateById: (req, res) => {
+		if (!req.body) {
+			res.status(400).send({
+				message: 'Content can not be empty!',
+			});
+		}
+		const product = Object.entries(req.body).map((item)=>{
+			return parseInt(item[1])>0?`${item[0]} =${item[1]}` : `${item[0]} ='${item[1]}'`;
+		});
+
+		Product.updateById(product, req.params.id, (err, data) => {
+			// if(product.name && product.price && product.updated_at, product.categoryId, product.description)
+			if (!err) {
+				res.send({
+					success: true,
+					message: 'Updated Success',
+					data: data
+				});
+			} else {
+				if (err.kind === 'not_found') {
+					res.status(404).send({
+						message: `Not found Product with id ${req.params.id}.`,
+					});
+				} else {
+					res.status(500).send({
+						message: 'Error retrieving Product with id ' + req.params.id,
+					});
+				}
+			}
+		});
+	},
+
 	deleteById: (req, res) => {
 		Product.deleteById(req.params.id, (err, data) => {
 			if(!err){

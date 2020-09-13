@@ -47,6 +47,22 @@ Cart.updateAll = (cart, id, result) => {
 		});
 };
 
+Cart.updateById = (cart, id, result) => {
+	db.query(`UPDATE ${tableName} SET ${cart} WHERE id=?`, 
+		[id], 
+		(err, res) => {
+			if(!err){
+				if(res.length){
+					result(null, res);
+				}else{
+					result({ kind: 'not_found' }, null);
+				}
+			}else{
+				result(err, null);
+			}
+		});
+};
+
 Cart.findAll = (result) =>{
 	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
 		if(!err){

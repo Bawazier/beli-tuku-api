@@ -49,6 +49,22 @@ User.updateAll = (user, id, result) => {
 	});
 };
 
+User.updateById = (user, id, result) => {
+	db.query(`UPDATE ${tableName} SET ${user} WHERE id=?`, 
+		[id], 
+		(err, res) => {
+			if(!err){
+				if(res.length){
+					result(null, res);
+				}else{
+					result({ kind: 'not_found' }, null);
+				}
+			}else{
+				result(err, null);
+			}
+		});
+};
+
 User.findAll = (result) =>{
 	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
 		if(!err){

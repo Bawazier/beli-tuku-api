@@ -60,6 +60,22 @@ Product.updateAll = (product, id, result) => {
 		});
 };
 
+Product.updateById = (product, id, result) => {
+	db.query(`UPDATE ${tableName} SET ${product} WHERE id=?`, 
+		[id], 
+		(err, res) => {
+			if(!err){
+				if(res.length){
+					result(null, res);
+				}else{
+					result({ kind: 'not_found' }, null);
+				}
+			}else{
+				result(err, null);
+			}
+		});
+};
+
 Product.deleteById = (id, result) => {
 	db.query(`DELETE FROM ${tableName} WHERE id = ?`, [id], (err, res) => {
 		if(!err){
