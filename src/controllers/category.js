@@ -1,43 +1,73 @@
 const Category = require('../models/category');
+const schema = require('../helper/userValidated');
+const categorySchema = schema.schemaCategory;
 
 
 module.exports = {
-	create: (req, res) => {
-		if (!req.body) {
+	create: async (req, res) => {
+		try {
+			const result = await categorySchema.validateAsync(req.body);
+			const category = {
+				name: result.name
+			};
+			Category.create(category, (err, data) => {
+				if (!err) {
+					res.status(201).send({
+						success: true,
+						message: 'Create New Category Success',
+						data: data
+					});
+				} else {
+					res.status(201).send({
+						success: false,
+						message: 'Create New Category Failled'
+					});
+				}
+			});
+		} catch (err) {
 			res.status(400).send({
-				message: 'Content can not be empty!',
+				message: err.details[0].message,
 			});
 		}
+	},
 
-		const category = {
-			name: req.body.name
-		};
+	update: async (req, res) => {
+		try {
+			const result = await categorySchema.validateAsync(req.body);
+			const category = {
+				name: result.name
+			};
 
-		Category.create(category, (err, data) => {
-			if(!err){
-				res.status(201).send({
-					success: true,
-					message: 'Create New Category Success',
-					data: data
-				});
-			}else{
-				res.status(201).send({
-					success: false,
-					message: 'Create New Category Failled'
-				});
-			}
-		});
+			Category.update(category, req.params.id, (err, data) => {
+				if (!err) {
+					res.send({
+						success: true,
+						message: 'Updated Success',
+						data: data
+					});
+				} else {
+					res.send({
+						success: false,
+						message: 'Updated Failled'
+					});
+				}
+			});
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
+			});
+		}
 	},
 
 	findAll: (req, res) => {
 		Category.findAll((err, data) => {
-			if(!err){
+			if (!err) {
 				res.status(201).send({
 					success: true,
 					message: 'Find All Category Success',
 					data: data
 				});
-			}else{
+			} else {
 				res.status(201).send({
 					success: false,
 					message: 'Find All Category Failled'
@@ -48,13 +78,13 @@ module.exports = {
 
 	findById: (req, res) => {
 		Category.findById(req.params.id, (err, data) => {
-			if(!err){
+			if (!err) {
 				res.status(201).send({
 					success: true,
 					message: 'Find Category By ID Success',
 					data: data
 				});
-			}else{
+			} else {
 				if (err.kind === 'not_found') {
 					res.status(404).send({
 						message: `Not found Category with id ${req.params.id}.`,
@@ -68,42 +98,15 @@ module.exports = {
 		});
 	},
 
-	update: (req, res) => {
-		if (!req.body) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
-			});
-		}
-
-		const category = {
-			name: req.body.name
-		};
-
-		Category.update(category, req.params.id, (err, data) => {
-			if (!err) {
-				res.send({
-					success: true,
-					message: 'Updated Success',
-					data: data
-				});
-			} else {
-				res.send({
-					success: false,
-					message: 'Updated Failled'
-				});
-			}
-		});
-	},
-
 	delete: (req, res) => {
 		Category.delete(req.params.id, (err, data) => {
-			if(!err){
+			if (!err) {
 				res.status(201).send({
 					success: true,
 					message: `Delete ${req.params.id} Success`,
 					data: data
 				});
-			}else{
+			} else {
 				if (err.kind === 'not_found') {
 					res.status(404).send({
 						message: `Not found Category with id ${req.params.id}.`,

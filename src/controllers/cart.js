@@ -1,19 +1,17 @@
 const Cart = require('../models/cart');
-
+const schema = require('../helper/userValidated');
+const cartSchema = schema.schemaCart;
+const cartUpdateSchema = schema.schemaUpdateCart;
 
 module.exports = {
-	create: (req, res) => {
-		const cart = {
-			user_id: req.body.user_id,
-			product_id: req.body.product_id,
-			quantity: req.body.quantity
-		};
-
-		if (!cart.user_id || !cart.product_id || !cart.quantity) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
-			});
-		}else{
+	create: async (req, res) => {
+		try {
+			const result = await cartSchema.validateAsync(req.body);
+			const cart = {
+				user_id: result.user_id,
+				product_id: result.product_id,
+				quantity: result.quantity
+			};
 			Cart.create(cart, (err) => {
 				if (!err) {
 					res.status(201).send({
@@ -29,19 +27,19 @@ module.exports = {
 					});
 				}
 			});		
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
+			});		
 		}
 	},
 
-	updateQuantity: (req, res) => {
-		const cart = {
-			quantity: req.body.quantity
-		};
-
-		if (!cart.quantity) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
-			});
-		}else{
+	updateQuantity: async (req, res) => {
+		try {
+			const result = await cartUpdateSchema.validateAsync(req.body);
+			const cart = {
+				quantity: result.quantity
+			};
 			Cart.updateQuantity(cart, req.params.id, (err, data) => {
 				if (!err) {
 					res.status(201).send({
@@ -50,7 +48,6 @@ module.exports = {
 						data: { ...cart }
 					});
 				} else {
-					console.log(err);
 					res.status(500).send({
 						success: false,
 						message: 'Update Data Failled',
@@ -58,6 +55,10 @@ module.exports = {
 					});
 				}
 			});
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
+			});		
 		}
 	},
 

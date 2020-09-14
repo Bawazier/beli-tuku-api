@@ -1,22 +1,21 @@
 const User = require('../models/user');
+const schema = require('../helper/userValidated');
+const userSchema = schema.schemaUser;
+const userUpdateSchema = schema.schemaUpdateUser;
 
 
 module.exports = {
-	create: (req, res) => {
-		const user = {
-			name: req.body.name,
-			email: req.body.email,
-			password: req.body.password,
-			phone: req.body.phone,
-			gender: req.body.gender,
-			dateOfBirth: req.body.dateOfBirth
-		};
-
-		if (!user.name || !user.email || !user.password || !user.phone) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
-			});
-		}else{
+	create: async (req, res) => {
+		try {
+			const result = await userSchema.validateAsync(req.body);
+			const user = {
+				name: result.name,
+				email: result.email,
+				password: result.password,
+				phone: result.phone,
+				gender: result.gender,
+				dateOfBirth: result.dateOfBirth
+			};
 			User.create(user, (err, data) => {
 				if (!err) {
 					res.status(201).send({
@@ -32,25 +31,25 @@ module.exports = {
 						data: data
 					});
 				}
+			});
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
 			});		
 		}
 	},
 
-	updateAll: (req, res) => {
-		const user = {
-			name: req.body.name,
-			email: req.body.email,
-			password: req.body.password,
-			phone: req.body.phone,
-			gender: req.body.gender,
-			dateOfBirth: req.body.dateOfBirth
-		};
-
-		if (!user.name || !user.email || !user.password || !user.phone) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
-			});
-		}else{
+	updateAll: async (req, res) => {
+		try {
+			const result = await userSchema.validateAsync(req.body);
+			const user = {
+				name: result.name,
+				email: result.email,
+				password: result.password,
+				phone: result.phone,
+				gender: result.gender,
+				dateOfBirth: result.dateOfBirth
+			};
 			User.updateAll(user, req.params.id, (err, data) => {
 				if (!err) {
 					res.status(201).send({
@@ -67,39 +66,45 @@ module.exports = {
 					});
 				}
 			});
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
+			});		
 		}
 	},
 
-	updateById: (req, res) => {
-		if (!req.body) {
-			res.status(400).send({
-				message: 'Content can not be empty!',
+	updateById: async (req, res) => {
+		try {
+			const result = await userUpdateSchema.validateAsync(req.body);
+			const user = Object.entries(result).map((item)=>{
+				return parseInt(item[1])>0?`${item[0]} =${item[1]}` : `${item[0]} ='${item[1]}'`;
 			});
-		}
-		const user = Object.entries(req.body).map((item)=>{
-			return parseInt(item[1])>0?`${item[0]} =${item[1]}` : `${item[0]} ='${item[1]}'`;
-		});
 
-		User.updateById(user, req.params.id, (err, data) => {
+			User.updateById(user, req.params.id, (err, data) => {
 			// if(user.name && user.price && user.updated_at, user.categoryId, user.description)
-			if (!err) {
-				res.send({
-					success: true,
-					message: 'Updated Success',
-					data: data
-				});
-			} else {
-				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found User with id ${req.params.id}.`,
+				if (!err) {
+					res.send({
+						success: true,
+						message: 'Updated Success',
+						data: data
 					});
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving User with id ' + req.params.id,
-					});
+					if (err.kind === 'not_found') {
+						res.status(404).send({
+							message: `Not found User with id ${req.params.id}.`,
+						});
+					} else {
+						res.status(500).send({
+							message: 'Error retrieving User with id ' + req.params.id,
+						});
+					}
 				}
-			}
-		});
+			});
+		} catch (err) {
+			res.status(400).send({
+				message: err.details[0].message,
+			});		
+		}
 	},
 
 	findById: (req, res) => {
