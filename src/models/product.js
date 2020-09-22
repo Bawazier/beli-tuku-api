@@ -33,7 +33,9 @@ Product.create = (product, result)=>{
 };
 
 Product.findById = (id, result) => {
-	db.query(`SELECT * FROM ${tableName} WHERE id = ?`, [id], (err, res) => {
+	db.query(`SELECT product.id, product.name AS productName, product.price, category.name AS Category, product.created_at, product.updated_at, product.description 
+	AS categoryName FROM ${tableName} 
+	INNER JOIN ${tableJoin} ON product.category_id = category.id WHERE product.id = ?`, [id], (err, res) => {
 		if(!err){
 			if(res.length){
 				result(null, res);
