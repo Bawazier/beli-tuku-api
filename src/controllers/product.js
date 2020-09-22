@@ -137,7 +137,7 @@ module.exports = {
 			searchKey = Object.keys(search)[0];
 			searchValue = Object.values(search)[0];
 		} else {
-			searchKey = 'name';
+			searchKey = 'product.name';
 			searchValue = search || '';
 		}
 
@@ -175,6 +175,7 @@ module.exports = {
 					pageInfo
 				});
 			} else {
+				console.log(err);
 				res.status(500).send({
 					message: 'Error retrieving Product with id ' + req.params.id,
 				});

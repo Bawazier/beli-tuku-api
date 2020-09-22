@@ -47,7 +47,9 @@ Product.findById = (id, result) => {
 };
 
 Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) =>{
-	db.query(`SELECT * FROM ${tableName} WHERE ${searchKey} LIKE '%${searchValue}%' 
+	db.query(`SELECT product.id, product.name AS productName, product.price, category.name AS Category, product.created_at, product.updated_at, product.description 
+	AS categoryName FROM ${tableName} 
+	INNER JOIN ${tableJoin} ON product.category_id = category.id WHERE ${searchKey} LIKE '%${searchValue}%' 
 	ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`, (err, res) => {
 		if(!err){
 			if(res.length){
