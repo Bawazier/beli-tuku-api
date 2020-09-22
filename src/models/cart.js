@@ -68,7 +68,8 @@ Cart.updateById = (cart, id, result) => {
 };
 
 Cart.findById = (id, result) => {
-	db.query(`SELECT * FROM ${tableName} WHERE id=?`, [id], (err, res) => {
+	db.query('SELECT cart.id, user.name AS nameUser, product.name AS productName, product.price, cart.quantity, cart.totalPrice ' + 
+	'FROM cart INNER JOIN user ON cart.user_id = user.id INNER JOIN product ON cart.product_id = product.id WHERE cart.id=?', [id], (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -84,7 +85,9 @@ Cart.findById = (id, result) => {
 
 
 Cart.findAll = (result) => {
-	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
+	db.query('SELECT cart.id, user.name AS nameUser, product.name AS productName, product.price, cart.quantity, cart.totalPrice ' + 
+	'FROM cart INNER JOIN user ON cart.user_id = user.id INNER JOIN product ON cart.product_id = product.id',
+	(err, res) => {
 		if (!err) {
 			result(null, res);
 		} else {
