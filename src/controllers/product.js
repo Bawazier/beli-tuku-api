@@ -5,6 +5,7 @@ const qs = require('querystring');
 const schema = require('../helper/userValidated');
 const productSchema = schema.schemaProduct;
 const productUpdateSchema = schema.schemaUpdateProduct;
+const responeUser = require('../helper/respone');
 
 
 module.exports = {
@@ -19,25 +20,15 @@ module.exports = {
 				categoryId: result.categoryId,
 				description: result.description
 			});
-			Product.create(product, (err) => {
+			Product.create(product, (err, data) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Insert Data Success',
-						data: { ...product }
-					});
+					responeUser(res, 'Insert Data Success', { data });
 				} else {
-					res.status(500).send({
-						success: false,
-						message: 'Insert Data Failled',
-						data: err
-					});
+					responeUser(res, 'Insert Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -53,23 +44,14 @@ module.exports = {
 			});
 			Product.updateAll(product, req.params.id, (err, data) => {
 				if (!err) {
-					res.send({
-						success: true,
-						message: 'Updated Success',
-						data: data
-					});
+					responeUser(res, 'Update Data Success', { data });
 				} else {
-					res.send({
-						success: false,
-						message: 'Updated Failled',
-						data: err
-					});
+					responeUser(res, 'Update Data Failled', {}, 500, false);
+
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -83,47 +65,30 @@ module.exports = {
 			Product.updateById(product, req.params.id, (err, data) => {
 			// if(product.name && product.price && product.updated_at, product.categoryId, product.description)
 				if (!err) {
-					res.send({
-						success: true,
-						message: 'Updated Success',
-						data: data
-					});
+					responeUser(res, `Update Data By Id ${req.params.id} Success`, { data });
+
 				} else {
 					if (err.kind === 'not_found') {
-						res.status(404).send({
-							message: `Not found Product with id ${req.params.id}.`,
-						});
+						responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 					} else {
-						res.status(500).send({
-							message: 'Error retrieving Product with id ' + req.params.id,
-						});
+						responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 					}
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findById: (req, res) => {
 		Product.findById(req.params.id, (err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'SELECT BY ID SUCCESS',
-					data: data
-				});
+				responeUser(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found Product with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving Product with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -175,10 +140,7 @@ module.exports = {
 					pageInfo
 				});
 			} else {
-				console.log(err);
-				res.status(500).send({
-					message: 'Error retrieving Product with id ' + req.params.id,
-				});
+				responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 			}
 		});
 	},
@@ -186,20 +148,12 @@ module.exports = {
 	deleteById: (req, res) => {
 		Product.deleteById(req.params.id, (err, data) => {
 			if(!err){
-				res.status(201).send({
-					success: true,
-					message: `Delete ${req.params.id} Success`,
-					data: data
-				});
+				responeUser(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found Product with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving Product with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});

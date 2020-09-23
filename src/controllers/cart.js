@@ -2,6 +2,7 @@ const Cart = require('../models/cart');
 const schema = require('../helper/userValidated');
 const cartSchema = schema.schemaCart;
 const cartUpdateSchema = schema.schemaUpdateCart;
+const responeUser = require('../helper/respone');
 
 module.exports = {
 	create: async (req, res) => {
@@ -14,23 +15,13 @@ module.exports = {
 			};
 			Cart.create(cart, (err) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Insert Data Success',
-						data: { ...cart }
-					});
+					responeUser(res, 'Insert Data Success', { data });
 				} else {
-					res.status(500).send({
-						success: false,
-						message: 'Insert Data Failled',
-						data: err
-					});
+					responeUser(res, 'Insert Data Failled', {}, 500, false);
 				}
-			});		
+			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -42,23 +33,13 @@ module.exports = {
 			};
 			Cart.updateQuantity(cart, req.params.id, (err, data) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Update Data Success',
-						data: { ...cart }
-					});
+					responeUser(res, 'Update Data Success', { data });
 				} else {
-					res.status(500).send({
-						success: false,
-						message: 'Update Data Failled',
-						data: data
-					});
+					responeUser(res, 'Update Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -81,14 +62,14 @@ module.exports = {
 					data: data
 				});
 			} else {
-				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found Cart with id ${req.params.id}.`,
-					});
+				if (!err) {
+					responeUser(res, `Update Data By Id ${req.params.id} Success`, { data });
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving Cart with id ' + req.params.id,
-					});
+					if (err.kind === 'not_found') {
+						responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					}
 				}
 			}
 		});
@@ -97,20 +78,12 @@ module.exports = {
 	findById: (req, res) => {
 		Cart.findById(req.params.id, (err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'SELECT BY ID SUCCESS',
-					data: data
-				});
+				responeUser(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found cart with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving cart with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -119,20 +92,12 @@ module.exports = {
 	deleteById: (req, res) => {
 		Cart.deleteById(req.params.id, (err, data) => {
 			if(!err){
-				res.status(201).send({
-					success: true,
-					message: `Delete ${req.params.id} Success`,
-					data: data
-				});
+				responeUser(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found cart with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving cart with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -141,15 +106,9 @@ module.exports = {
 	findAll: (req, res) => {
 		Cart.findAll((err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'SELECT ALL SUCCESS',
-					data: data
-				});
+				responeUser(res, 'SELECT ALL SUCCESS', { data });
 			} else {
-				res.status(500).send({
-					message: 'Error retrieving cart with id ' + req.params.id,
-				});
+				responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 			}
 		});
 	},

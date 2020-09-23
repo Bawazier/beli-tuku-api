@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const db = require('../config/db');
+const db = require('../helper/db');
 
 const tableName = '`product`';
 const tableJoin = '`category`';

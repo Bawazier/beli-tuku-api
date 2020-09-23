@@ -1,6 +1,7 @@
 const Category = require('../models/category');
 const schema = require('../helper/userValidated');
 const categorySchema = schema.schemaCategory;
+const responeUser = require('../helper/respone');
 
 
 module.exports = {
@@ -12,22 +13,13 @@ module.exports = {
 			};
 			Category.create(category, (err, data) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Create New Category Success',
-						data: data
-					});
+					responeUser(res, 'Insert Data Success', { data });
 				} else {
-					res.status(201).send({
-						success: false,
-						message: 'Create New Category Failled'
-					});
+					responeUser(res, 'Insert Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -40,38 +32,22 @@ module.exports = {
 
 			Category.update(category, req.params.id, (err, data) => {
 				if (!err) {
-					res.send({
-						success: true,
-						message: 'Updated Success',
-						data: data
-					});
+					responeUser(res, 'Update Data Success', { data });
 				} else {
-					res.send({
-						success: false,
-						message: 'Updated Failled'
-					});
+					responeUser(res, 'Update Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findAll: (req, res) => {
 		Category.findAll((err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'Find All Category Success',
-					data: data
-				});
+				responeUser(res, 'SELECT ALL SUCCESS', { data });
 			} else {
-				res.status(201).send({
-					success: false,
-					message: 'Find All Category Failled'
-				});
+				responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 			}
 		});
 	},
@@ -79,20 +55,12 @@ module.exports = {
 	findById: (req, res) => {
 		Category.findById(req.params.id, (err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'Find Category By ID Success',
-					data: data
-				});
+				responeUser(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found Category with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving Category with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -100,21 +68,13 @@ module.exports = {
 
 	delete: (req, res) => {
 		Category.delete(req.params.id, (err, data) => {
-			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: `Delete ${req.params.id} Success`,
-					data: data
-				});
-			} else {
+			if(!err){
+				responeUser(res, `Delete ${req.params.id} Success`, { data });
+			}else{
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found Category with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving Category with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});

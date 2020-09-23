@@ -2,6 +2,7 @@ const User = require('../models/user');
 const schema = require('../helper/userValidated');
 const userSchema = schema.schemaUser;
 const userUpdateSchema = schema.schemaUpdateUser;
+const responeUser = require('../helper/respone');
 
 
 module.exports = {
@@ -18,24 +19,13 @@ module.exports = {
 			};
 			User.create(user, (err, data) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Insert Data Success',
-						data: { ...user }
-					});
+					responeUser(res, 'Insert Data Success', { data });
 				} else {
-					console.log(err);
-					res.status(500).send({
-						success: false,
-						message: 'Insert Data Failled',
-						data: data
-					});
+					responeUser(res, 'Insert Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -52,24 +42,13 @@ module.exports = {
 			};
 			User.updateAll(user, req.params.id, (err, data) => {
 				if (!err) {
-					res.status(201).send({
-						success: true,
-						message: 'Update Data Success',
-						data: { ...user }
-					});
+					responeUser(res, 'Update Data Success', { data });
 				} else {
-					console.log(err);
-					res.status(500).send({
-						success: false,
-						message: 'Update Data Failled',
-						data: data
-					});
+					responeUser(res, 'Update Data Failled', {}, 500, false);
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -81,49 +60,30 @@ module.exports = {
 			});
 
 			User.updateById(user, req.params.id, (err, data) => {
-			// if(user.name && user.price && user.updated_at, user.categoryId, user.description)
 				if (!err) {
-					res.send({
-						success: true,
-						message: 'Updated Success',
-						data: data
-					});
+					responeUser(res, `Update Data By Id ${req.params.id} Success`, { data });
 				} else {
 					if (err.kind === 'not_found') {
-						res.status(404).send({
-							message: `Not found User with id ${req.params.id}.`,
-						});
+						responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 					} else {
-						res.status(500).send({
-							message: 'Error retrieving User with id ' + req.params.id,
-						});
+						responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 					}
 				}
 			});
 		} catch (err) {
-			res.status(400).send({
-				message: err.details[0].message,
-			});		
+			responeUser(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findById: (req, res) => {
 		User.findById(req.params.id, (err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'SELECT BY ID SUCCESS',
-					data: data
-				});
+				responeUser(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found User with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving User with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -132,20 +92,12 @@ module.exports = {
 	deleteById: (req, res) => {
 		User.deleteById(req.params.id, (err, data) => {
 			if(!err){
-				res.status(201).send({
-					success: true,
-					message: `Delete ${req.params.id} Success`,
-					data: data
-				});
+				responeUser(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					res.status(404).send({
-						message: `Not found User with id ${req.params.id}.`,
-					});
+					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					res.status(500).send({
-						message: 'Error retrieving User with id ' + req.params.id,
-					});
+					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -154,15 +106,9 @@ module.exports = {
 	findAll: (req, res) => {
 		User.findAll((err, data) => {
 			if (!err) {
-				res.status(201).send({
-					success: true,
-					message: 'SELECT ALL SUCCESS',
-					data: data
-				});
+				responeUser(res, 'SELECT ALL SUCCESS', { data });
 			} else {
-				res.status(500).send({
-					message: 'Error retrieving User with id ' + req.params.id,
-				});
+				responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 			}
 		});
 	},

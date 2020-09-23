@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const db = require('../helper/db');
 
 const tableName = '`cart`';
 const tableJoin = ['`product`', '`user`'];
