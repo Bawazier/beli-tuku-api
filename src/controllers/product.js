@@ -18,7 +18,8 @@ module.exports = {
 				created_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 				categoryId: result.categoryId,
-				description: result.description
+				description: result.description,
+				picture: req.file.path
 			});
 			Product.create(product, (err, data) => {
 				if (!err) {
@@ -40,7 +41,8 @@ module.exports = {
 				price: result.price,
 				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 				categoryId: result.categoryId,
-				description: result.description
+				description: result.description,
+				picture: req.file.path
 			});
 			Product.updateAll(product, req.params.id, (err, data) => {
 				if (!err) {

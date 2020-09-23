@@ -11,14 +11,15 @@ const Product = function (product) {
 	this.updated_at = product.updated_at;
 	this.categoryId = product.categoryId;
 	this.description = product.description;
+	this.picture = product.picture;
 };
 
 Product.create = (product, result)=>{
 	db.query(`SELECT * FROM ${tableJoin} WHERE id = ?`, [product.categoryId], (err, res) =>{
 		if(res.length){
-			db.query(`INSERT INTO ${tableName} (name, price, created_at, updated_at, category_id, description)
-	VALUES (?,?,?,?,?,?)`, [product.name, product.price, product.created_at, product.updated_at, 
-				product.categoryId, product.description], (err) => {
+			db.query(`INSERT INTO ${tableName} (name, price, created_at, updated_at, category_id, picture, description)
+	VALUES (?,?,?,?,?,?,?)`, [product.name, product.price, product.created_at, product.updated_at, 
+				product.categoryId,product.picture, product.description], (err) => {
 				if(!err){
 					result(null, {...product});
 				}else{
