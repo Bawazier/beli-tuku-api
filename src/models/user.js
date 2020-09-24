@@ -11,6 +11,17 @@ const User = function (user) {
 	this.dateOfBirth = user.dateOfBirth;
 };
 
+User.login = (user, result) => {
+	db.query('SELECT * FROM ?? WHERE email=? AND password=?', ['user', user.email, user.password], 
+		(err, res) => {
+			if(!err){
+				result(null, res);
+			}else{
+				result(err, false);
+			}
+		});
+};
+
 User.create = (user, result) => {
 	db.query(`INSERT INTO ${tableName} (name, email, password, phone, gender, dateOfBirth) 
 	VALUES (?,?,?,?,?,?)`, [user.name, user.email, user.password, user.phone, user.gender, user.dateOfBirth],

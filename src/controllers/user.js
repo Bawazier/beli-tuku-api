@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const schema = require('../helper/userValidated');
 const userSchema = schema.schemaUser;
@@ -6,6 +7,26 @@ const responeUser = require('../helper/respone');
 
 
 module.exports = {
+	login: async (req, res) => {
+		// const result = await userLoginSchema.validateAsync(req.body);
+		const user = {
+			email: req.body.email,
+			password: req.body.password
+		};
+		User.login(user, (err, data) => {
+			if(!err && data.length){
+				jwt.sign({ id: data[0].id }, 'KODE', function(err, token) {
+					if(!err){
+						responeUser(res, token, {});
+					}else{
+						responeUser(res, 'Login Gagal', {}, 403, false);
+					}
+				});
+			}else{
+				responeUser(res, 'Login Gagal', {}, 500, false);
+			}
+		});
+	},
 	create: async (req, res) => {
 		try {
 			const result = await userSchema.validateAsync(req.body);

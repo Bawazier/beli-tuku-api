@@ -19,5 +19,8 @@ const cartRouter = require('./src/routes/cart');
 // attach member router
 app.use('/product', productRouter);
 app.use('/category', categoryRouter);
-app.use('/cart', cartRouter);
 app.use('/user', userRouter);
+
+//Customer auth
+const customerAuth = require('./src/middlewares/auth');
+app.use('/cart', customerAuth, cartRouter);
