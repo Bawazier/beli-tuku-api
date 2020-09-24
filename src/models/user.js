@@ -23,15 +23,22 @@ User.login = (user, result) => {
 };
 
 User.create = (user, result) => {
-	db.query(`INSERT INTO ${tableName} (name, email, password, phone, gender, dateOfBirth) 
-	VALUES (?,?,?,?,?,?)`, [user.name, user.email, user.password, user.phone, user.gender, user.dateOfBirth],
-	(err, res) => {
-		if(!err){
-			result(null, { ...user });
+	db.query('SELECT * FROM ?? WHERE email=?', ['user', user.email], (err, res)=>{
+		if(!res.length){
+			db.query(`INSERT INTO ${tableName} (name, email, password, phone, gender, dateOfBirth) 
+			VALUES (?,?,?,?,?,?)`, [user.name, user.email, user.password, user.phone, user.gender, user.dateOfBirth],
+			(err, res) => {
+				if(!err){
+					result(null, { ...user });
+				}else{
+					result(err, res);
+				}
+			});
 		}else{
-			result(err, res);
+			result(err, null);
 		}
 	});
+	
 };
 
 User.findById = (id, result) => {
