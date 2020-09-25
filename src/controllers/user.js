@@ -4,6 +4,7 @@ const schema = require('../helper/userValidated');
 const userSchema = schema.schemaUser;
 const userUpdateSchema = schema.schemaUpdateUser;
 const loginSchema = schema.schemaLogin;
+const imagesSchema = schema.schemaImages;
 const responeStandart = require('../helper/respone');
 
 
@@ -15,15 +16,15 @@ module.exports = {
 			password: result.password
 		};
 		User.login(user, (err, data) => {
-			if(!err && data.length){
-				jwt.sign({ id: data[0].id }, 'KODE', function(err, token) {
-					if(!err){
+			if (!err && data.length) {
+				jwt.sign({ id: data[0].id }, 'KODE', function (err, token) {
+					if (!err) {
 						return responeStandart(res, token, {});
-					}else{
+					} else {
 						return responeStandart(res, 'Login Gagal', {}, 403, false);
 					}
 				});
-			}else{
+			} else {
 				return responeStandart(res, 'Login Gagal', {}, 500, false);
 			}
 		});
@@ -31,6 +32,7 @@ module.exports = {
 	create: async (req, res) => {
 		try {
 			const result = await userSchema.validateAsync(req.body);
+			const images = await imagesSchema.validateAsync(req.file.path);
 			const user = {
 				name: result.name,
 				email: result.email,
@@ -38,8 +40,9 @@ module.exports = {
 				phone: result.phone,
 				gender: result.gender,
 				dateOfBirth: result.dateOfBirth,
-				picture: req.file.path
+				picture: images
 			};
+
 			User.create(user, (err, data) => {
 				if (!err) {
 					return responeStandart(res, 'Insert Data Success', { data });
@@ -47,8 +50,8 @@ module.exports = {
 					return responeStandart(res, err, {}, 500, false);
 				}
 			});
-		} catch (err) {
-			return responeStandart(res, err.details[0].message, {}, 400, false);
+		} catch (e) {
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -71,8 +74,8 @@ module.exports = {
 					return responeStandart(res, 'Update Data Failled', {}, 500, false);
 				}
 			});
-		} catch (err) {
-			return responeStandart(res, err.details[0].message, {}, 400, false);
+		} catch (e) {
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -92,9 +95,9 @@ module.exports = {
 
 	deleteById: (req, res) => {
 		User.deleteById(req.params.id, (err, data) => {
-			if(!err){
+			if (!err) {
 				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
-			}else{
+			} else {
 				if (err.kind === 'not_found') {
 					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
@@ -109,7 +112,7 @@ module.exports = {
 			if (!err) {
 				return responeStandart(res, 'SELECT ALL SUCCESS', { data });
 			} else {
-				return responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+				return responeStandart(res, 'SELECT ALL FAILLED', {}, 500, false);
 			}
 		});
 	},

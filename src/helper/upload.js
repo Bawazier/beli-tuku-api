@@ -12,12 +12,15 @@ const storage = multer.diskStorage({
 
 const options = multer({
 	storage: storage,
-	limits: {
-		fileSize: 500 * 1024
-	},
+	// limits: {
+	// 	fileSize: 500 * 1024
+	// },
 	fileFilter: (req, file, cb) => {
 		if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-			return cb(new Error('Only image are allowed.'), false);
+			cb(new Error('Only image are allowed.'), false);
+		}
+		if(file.size > (500 * 1024)){
+			cb(new Error('Size image not allowed.'), false);
 		}
 		cb(null, true);
 	}

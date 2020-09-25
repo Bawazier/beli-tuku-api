@@ -43,6 +43,7 @@ User.create = (user, result) => {
 	const contents = [
 		tableName,
 		{
+			roles_id: 1,
 			name: user.name,
 			email: user.email,
 			password: user.password,
@@ -59,6 +60,7 @@ User.create = (user, result) => {
 				if(!err){
 					result(null, { ...user });
 				}else{
+					console.log(err);
 					result('Insert Data Failled', res);
 				}
 			});

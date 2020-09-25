@@ -21,7 +21,8 @@ const userSchema = joi.object({
 
 	gender: joi.string().valid('male', 'female').lowercase().required(),
 
-	dateOfBirth: joi.date().max('1-1-2018').iso().required()
+	dateOfBirth: joi.date().max('1-1-2018').iso().required(),
+
 });
 
 const userUpdateSchema = joi.object({
@@ -71,6 +72,8 @@ const globalSchema = joi.object({
 	role: joi.string().min(3).max(30)
 });
 
+const imagesSchema = joi.string().pattern(/\.(jpg|jpeg|png)$/);
+
 module.exports = {
 	schemaUser: userSchema,
 	schemaUpdateUser: userUpdateSchema,
@@ -79,5 +82,6 @@ module.exports = {
 	schemaCart: cartSchema,
 	schemaUpdateCart: cartUpdateSchema,
 	shemaLogin: loginSchema,
-	schemaGlobal: globalSchema
+	schemaGlobal: globalSchema,
+	schemaImages: imagesSchema
 };
