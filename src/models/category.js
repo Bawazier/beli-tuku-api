@@ -1,13 +1,29 @@
 const db = require('../helper/db');
 
-const tableName = '`category`';
+const tableName = 'category';
 
 const Category = function (category) {
 	this.name = category.name;
+	this.image = category.image;
 };
 
+const queryFindAll = 'SELECT * FROM ??';
+// const queryFindById = 'SELECT * FROM ?? WHERE ?';
+// const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
+const queryInsert = 'INSERT INTO ?? SET ?';
+const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
+const queryDelete = 'DELETE FROM ?? WHERE ?';
+
 Category.create = (category, result) => {
-	db.query(`INSERT INTO ${tableName} (name) VALUES (?)`, [category.name], (err) => {
+	const contents = [
+		tableName,
+		{
+			name: category.name,
+			image: category.image
+		}
+	];
+
+	db.query(queryInsert, contents, (err) => {
 		if(!err){
 			result(null, { ...category });
 		}else{
@@ -17,7 +33,7 @@ Category.create = (category, result) => {
 };
 
 Category.findAll = (result) => {
-	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
+	db.query(queryFindAll, [tableName], (err, res) => {
 		if(!err){
 			result(null, res);
 		}else{
@@ -26,22 +42,17 @@ Category.findAll = (result) => {
 	});
 };
 
-Category.findById = (id, result) => {
-	db.query(`SELECT * FROM ${tableName} WHERE id=?`, [id], (err, res) => {
-		if(!err){
-			if(res.length){
-				result(null, res);
-			}else{
-				result({ kind: 'not_found' }, null);
-			}
-		}else{
-			result(err, null);
-		}
-	});
-};
-
 Category.update = (category, id, result) => {
-	db.query(`UPDATE ${tableName} SET name=? WHERE id=?`, [category.name, id], (err, res) => {
+	const contents = [
+		tableName,
+		{
+			name: category.name,
+			image: category.image
+		},
+		{id: id}
+	];
+
+	db.query(queryUpdate, contents, (err, res) => {
 		if(!err){
 			if(res.length){
 				result(null, res);
@@ -55,7 +66,12 @@ Category.update = (category, id, result) => {
 };
 
 Category.delete = (id, result) => {
-	db.query(`DELETE FROM ${tableName} WHERE id=?`, [id], (err, res) => {
+	const contents = [
+		tableName,
+		{id: id}
+	];
+
+	db.query(queryDelete, contents, (err, res) => {
 		if(!err){
 			if(res.length){
 				result(null, res);

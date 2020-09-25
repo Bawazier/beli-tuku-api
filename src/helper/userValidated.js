@@ -1,5 +1,11 @@
 const joi = require('joi');
 
+const loginSchema = joi.object({
+	email: joi.string().email().required(),
+	password: joi.string()
+		.pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+});
+
 const userSchema = joi.object({
 	name: joi.string()
 		.min(3)
@@ -55,20 +61,23 @@ const cartSchema = joi.object({
 	quantity: joi.number().integer().positive().required()
 });
 
-const categorySchema = joi.object({
-	name: joi.string().min(3).max(30).required()
-});
-
 const cartUpdateSchema = joi.object({
 	quantity: joi.number().integer().positive().required()
 });
 
+const globalSchema = joi.object({
+	name: joi.string().min(3).max(30),
+	status: joi.string().min(3).max(30),
+	role: joi.string().min(3).max(30)
+});
+
 module.exports = {
-	schemaCategory: categorySchema,
 	schemaUser: userSchema,
 	schemaUpdateUser: userUpdateSchema,
 	schemaUpdateProduct: productUpdateSchema,
 	schemaProduct: productSchema,
 	schemaCart: cartSchema,
 	schemaUpdateCart: cartUpdateSchema,
+	shemaLogin: loginSchema,
+	schemaGlobal: globalSchema
 };

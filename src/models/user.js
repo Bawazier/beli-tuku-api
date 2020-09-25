@@ -1,18 +1,31 @@
 const db = require('../helper/db');
 
-const tableName = '`user`';
+const tableName = 'user';
 
 const User = function (user) {
+	this.roles_id = user.roles_id;
 	this.name = user.name;
 	this.email = user.email;
 	this.password = user.password;
 	this.phone = user.phone;
 	this.gender = user.gender;
 	this.dateOfBirth = user.dateOfBirth;
+	this.picture = user.picture;
 };
 
+// const queryFindAll = 'SELECT * FROM ??';
+const queryFindById = 'SELECT * FROM ?? WHERE ?';
+const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
+const queryInsert = 'INSERT INTO ?? SET ?';
+const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
+const queryDelete = 'DELETE FROM ?? WHERE ?';
+
+const queryLogin = 'SELECT * FROM ?? WHERE email=? AND password=?';
+
 User.login = (user, result) => {
-	db.query('SELECT * FROM ?? WHERE email=? AND password=?', ['user', user.email, user.password], 
+	const contents = [tableName, user.email, user.password];
+
+	db.query(queryLogin, contents, 
 		(err, res) => {
 			if(!err){
 				result(null, res);
@@ -23,26 +36,46 @@ User.login = (user, result) => {
 };
 
 User.create = (user, result) => {
-	db.query('SELECT * FROM ?? WHERE email=?', ['user', user.email], (err, res)=>{
+	const contentsValidate = [
+		tableName,
+		{email: user.email}
+	];
+	const contents = [
+		tableName,
+		{
+			name: user.name,
+			email: user.email,
+			password: user.password,
+			phone: user.phone,
+			gender: user.gender,
+			dateOfBirth: user.dateOfBirth,
+			picture: user.picture
+		}
+	];
+
+	db.query(queryFindById, contentsValidate, (_err, res)=>{
 		if(!res.length){
-			db.query(`INSERT INTO ${tableName} (name, email, password, phone, gender, dateOfBirth) 
-			VALUES (?,?,?,?,?,?)`, [user.name, user.email, user.password, user.phone, user.gender, user.dateOfBirth],
-			(err, res) => {
+			db.query(queryInsert, contents,(err, res) => {
 				if(!err){
 					result(null, { ...user });
 				}else{
-					result(err, res);
+					result('Insert Data Failled', res);
 				}
 			});
 		}else{
-			result(err, null);
+			result('Email already used', null);
 		}
 	});
 	
 };
 
 User.findById = (id, result) => {
-	db.query(`SELECT * FROM ${tableName} WHERE id=?`, [id], (err, res) => {
+	const contents = [
+		tableName,
+		{id: id}
+	];
+
+	db.query(queryFindById, contents, (err, res) => {
 		if(!err) {
 			if(res.length){
 				result(null, res);
@@ -55,10 +88,24 @@ User.findById = (id, result) => {
 	});
 };
 
-User.updateAll = (user, id, result) => {
-	db.query(`UPDATE ${tableName} SET name=?, email=?, password=?, phone=?, gender=?, dateOfBirth=? 
-	WHERE id=?`, [user.name, user.email, user.password, user.phone, user.gender, user.dateOfBirth, id], 
-	(err, res) => {
+User.update = (user, id, result) => {
+	const contents = [
+		tableName,
+		{
+			name: user.name,
+			email: user.email,
+			password: user.password,
+			phone: user.phone,
+			gender: user.gender,
+			dateOfBirth: user.dateOfBirth,
+			picture: user.picture
+		},
+		{
+			id: id
+		}
+	];
+
+	db.query(queryUpdate, [contents], (err, res) => {
 		if(!err){
 			result(null, {...user});
 		}else{
@@ -67,24 +114,20 @@ User.updateAll = (user, id, result) => {
 	});
 };
 
-User.updateById = (user, id, result) => {
-	db.query(`UPDATE ${tableName} SET ${user} WHERE id=?`, 
-		[id], 
-		(err, res) => {
-			if(!err){
-				if(res.length){
-					result(null, res);
-				}else{
-					result({ kind: 'not_found' }, null);
-				}
-			}else{
-				result(err, null);
-			}
-		});
-};
-
 User.findAll = (result) =>{
-	db.query(`SELECT * FROM ${tableName}`, (err, res) => {
+	const contents = [
+		[
+			'name',
+			'email',
+			'gender',
+			'gender',
+			'picture'
+		],
+		'dateOfBirth',
+		tableName,
+	];
+
+	db.query(queryFind, contents, (err, res) => {
 		if(!err){
 			result(null, res);
 		}else{
@@ -94,7 +137,14 @@ User.findAll = (result) =>{
 };
 
 User.deleteById = (id, result) => {
-	db.query(`DELETE FROM ${tableName} WHERE id = ?`, [id], (err, res) => {
+	const contents = [
+		tableName,
+		{
+			id: id
+		}
+	];
+
+	db.query(queryDelete, contents, (err, res) => {
 		if(!err){
 			result(null, res);
 		}else{

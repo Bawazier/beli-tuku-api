@@ -17,7 +17,7 @@ module.exports = {
 				price: result.price,
 				created_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
-				categoryId: result.categoryId,
+				category_id: result.category_id,
 				description: result.description,
 				picture: req.file.path
 			});
@@ -40,7 +40,7 @@ module.exports = {
 				name: result.name,
 				price: result.price,
 				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
-				categoryId: result.categoryId,
+				category_id: result.category_id,
 				description: result.description,
 				picture: req.file.path
 			});
@@ -65,7 +65,6 @@ module.exports = {
 			});
 
 			Product.updateById(product, req.params.id, (err, data) => {
-			// if(product.name && product.price && product.updated_at, product.categoryId, product.description)
 				if (!err) {
 					responeUser(res, `Update Data By Id ${req.params.id} Success`, { data });
 
