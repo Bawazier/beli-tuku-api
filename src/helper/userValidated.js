@@ -81,7 +81,7 @@ module.exports = {
 	schemaProduct: productSchema,
 	schemaCart: cartSchema,
 	schemaUpdateCart: cartUpdateSchema,
-	shemaLogin: loginSchema,
+	schemaLogin: loginSchema,
 	schemaGlobal: globalSchema,
 	schemaImages: imagesSchema
 };

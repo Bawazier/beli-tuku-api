@@ -10,24 +10,28 @@ const responeStandart = require('../helper/respone');
 
 module.exports = {
 	login: async (req, res) => {
-		const result = await loginSchema.validateAsync(req.body);
-		const user = {
-			email: result.email,
-			password: result.password
-		};
-		User.login(user, (err, data) => {
-			if (!err && data.length) {
-				jwt.sign({ id: data[0].id }, 'KODE', function (err, token) {
-					if (!err) {
-						return responeStandart(res, token, {});
-					} else {
-						return responeStandart(res, 'Login Gagal', {}, 403, false);
-					}
-				});
-			} else {
-				return responeStandart(res, 'Login Gagal', {}, 500, false);
-			}
-		});
+		try {
+			const result = await loginSchema.validateAsync(req.body);
+			const user = {
+				email: result.email,
+				password: result.password
+			};
+			User.login(user, (err, data) => {
+				if (!err && data.length) {
+					jwt.sign({ id: data[0].id }, process.env.PRIVATE_CODE, function (err, token) {
+						if (!err) {
+							return responeStandart(res, token, {});
+						} else {
+							return responeStandart(res, 'Login Gagal', {}, 403, false);
+						}
+					});
+				} else {
+					return responeStandart(res, 'Login Gagal', {}, 500, false);
+				}
+			});
+		} catch (e) {
+			return responeStandart(res, e.details[0].message, {}, 400, false);
+		}
 	},
 	create: async (req, res) => {
 		try {
