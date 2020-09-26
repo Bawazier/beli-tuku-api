@@ -9,6 +9,7 @@
   "author": "Bawazieer",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "date-fns": "^2.16.1",
     "dotenv": "^8.2.0",
