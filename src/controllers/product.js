@@ -5,7 +5,7 @@ const qs = require('querystring');
 const schema = require('../helper/userValidated');
 const productSchema = schema.schemaProduct;
 const productUpdateSchema = schema.schemaUpdateProduct;
-const responeUser = require('../helper/respone');
+const responeStandart = require('../helper/respone');
 
 
 module.exports = {
@@ -13,83 +13,88 @@ module.exports = {
 		try {
 			const result = await productSchema.validateAsync(req.body);
 			const product = new Product({
+				user_id: result.user_id,
+				category_id: result.category_id,
+				conditions_id: result.conditions_id,
 				name: result.name,
 				price: result.price,
+				stock: result.stock,
+				maxSize: result.maxSize,
 				created_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
 				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
-				category_id: result.category_id,
 				description: result.description,
-				picture: req.file.path
 			});
 			Product.create(product, (err, data) => {
 				if (!err) {
-					responeUser(res, 'Insert Data Success', { data });
+					responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					responeUser(res, 'Insert Data Failled', {}, 500, false);
+					responeStandart(res, err, {}, 500, false);
 				}
 			});
 		} catch (err) {
-			responeUser(res, err.details[0].message, {}, 400, false);
+			responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
-	updateAll: async (req, res) => {
-		try {
-			const result = await productSchema.validateAsync(req.body);
-			const product = new Product({
-				name: result.name,
-				price: result.price,
-				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
-				category_id: result.category_id,
-				description: result.description,
-				picture: req.file.path
-			});
-			Product.updateAll(product, req.params.id, (err, data) => {
-				if (!err) {
-					responeUser(res, 'Update Data Success', { data });
-				} else {
-					responeUser(res, 'Update Data Failled', {}, 500, false);
-
-				}
-			});
-		} catch (err) {
-			responeUser(res, err.details[0].message, {}, 400, false);
-		}
-	},
-
-	updateById: async (req, res) => {
+	update: async (req, res) => {
 		try {
 			const result = await productUpdateSchema.validateAsync(req.body);
-			const product = Object.entries(result).map((item)=>{
-				return parseInt(item[1])>0?`${item[0]} =${item[1]}` : `${item[0]} ='${item[1]}'`;
+			const product = new Product({
+				user_id: result.user_id,
+				category_id: result.category_id,
+				conditions_id: result.conditions_id,
+				name: result.name,
+				price: result.price,
+				stock: result.stock,
+				maxSize: result.maxSize,
+				updated_at: format(new Date(), 'yyyy-MM-dd kk:mm:ss'),
+				description: result.description,
 			});
-
-			Product.updateById(product, req.params.id, (err, data) => {
+			let filteredObject = Object.keys(product).reduce((result, key) => {
+				if (product[key] !== undefined) result[key] = product[key];
+				return result;
+			}, {});
+			
+			Product.update(filteredObject, req.params.id, (err, data) => {
 				if (!err) {
-					responeUser(res, `Update Data By Id ${req.params.id} Success`, { data });
+					responeStandart(res, `Update Data By Id ${req.params.id} Success`, { data });
 
 				} else {
 					if (err.kind === 'not_found') {
-						responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+						responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 					} else {
-						responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+						responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 					}
 				}
 			});
 		} catch (err) {
-			responeUser(res, err.details[0].message, {}, 400, false);
+			responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findById: (req, res) => {
 		Product.findById(req.params.id, (err, data) => {
 			if (!err) {
-				responeUser(res, `SELECT BY ID ${req.params.id} Success`, { data });
+				responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+				}
+			}
+		});
+	},
+
+	findByUserId: (req, res) => {
+		Product.findByUserId(req.params.id, (err, data) => {
+			if (!err) {
+				responeStandart(res, `SELECT BY User ID ${req.params.id} Success`, { data });
+			} else {
+				if (err.kind === 'not_found') {
+					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+				} else {
+					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});
@@ -141,7 +146,7 @@ module.exports = {
 					pageInfo
 				});
 			} else {
-				responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+				responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 			}
 		});
 	},
@@ -149,12 +154,26 @@ module.exports = {
 	deleteById: (req, res) => {
 		Product.deleteById(req.params.id, (err, data) => {
 			if(!err){
-				responeUser(res, `Delete ${req.params.id} Success`, { data });
+				responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeUser(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeUser(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+				}
+			}
+		});
+	},
+
+	deleteByUserId: (req, res) => {
+		Product.deleteByUserId(req.params.id, (err, data) => {
+			if(!err){
+				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+			}else{
+				if (err.kind === 'not_found') {
+					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+				} else {
+					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
 				}
 			}
 		});

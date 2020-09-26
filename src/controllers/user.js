@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const schema = require('../helper/userValidated');
 const userSchema = schema.schemaUser;
@@ -14,7 +15,7 @@ module.exports = {
 			const result = await loginSchema.validateAsync(req.body);
 			const user = {
 				email: result.email,
-				password: result.password
+				password: result.password,
 			};
 			User.login(user, (err, data) => {
 				if (!err && data.length) {
@@ -37,10 +38,14 @@ module.exports = {
 		try {
 			const result = await userSchema.validateAsync(req.body);
 			const images = await imagesSchema.validateAsync(req.file.path);
+			const saltRounds = 10;
+			const salt = await bcrypt.genSaltSync(saltRounds);
+			const hash = await bcrypt.hashSync(result.password, salt);
 			const user = {
+				roles_id: result.roles_id,
 				name: result.name,
 				email: result.email,
-				password: result.password,
+				password: hash,
 				phone: result.phone,
 				gender: result.gender,
 				dateOfBirth: result.dateOfBirth,
@@ -62,16 +67,23 @@ module.exports = {
 	update: async (req, res) => {
 		try {
 			const result = await userUpdateSchema.validateAsync(req.body);
+			// const images = await imagesSchema.validateAsync(req.file.path);
 			const user = {
+				roles_id: result.roles_id,
 				name: result.name,
 				email: result.email,
 				password: result.password,
 				phone: result.phone,
 				gender: result.gender,
 				dateOfBirth: result.dateOfBirth,
-				picture: req.file.path
+				// picture: images
 			};
-			User.update(user, req.params.id, (err, data) => {
+			let filteredObject = Object.keys(user).reduce((result, key) => {
+				if (user[key] !== undefined) result[key] = user[key];
+				return result;
+			}, {});
+
+			User.update(filteredObject, req.params.id, (err, data) => {
 				if (!err) {
 					return responeStandart(res, 'Update Data Success', { data });
 				} else {
@@ -86,7 +98,7 @@ module.exports = {
 	findById: (req, res) => {
 		User.findById(req.params.id, (err, data) => {
 			if (!err) {
-				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
+				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data, pictureURL: process.env.URL+data[0].picture});
 			} else {
 				if (err.kind === 'not_found') {
 					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
@@ -114,7 +126,7 @@ module.exports = {
 	findAll: (req, res) => {
 		User.findAll((err, data) => {
 			if (!err) {
-				return responeStandart(res, 'SELECT ALL SUCCESS', { data });
+				return responeStandart(res, 'SELECT ALL SUCCESS', { data, pictureURL: process.env.URL+data[0].picture });
 			} else {
 				return responeStandart(res, 'SELECT ALL FAILLED', {}, 500, false);
 			}

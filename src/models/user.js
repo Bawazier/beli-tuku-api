@@ -14,12 +14,12 @@ const User = function (user) {
 };
 
 // const queryFindAll = 'SELECT * FROM ??';
-const queryFindById = 'SELECT * FROM ?? WHERE ?';
+const queryFindById = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ?? WHERE ?';
 const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
 const queryInsert = 'INSERT INTO ?? SET ?';
 const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
 const queryDelete = 'DELETE FROM ?? WHERE ?';
-
+const queryValidateEmail = 'SELECT * FROM ?? WHERE ?';
 const queryLogin = 'SELECT * FROM ?? WHERE email=? AND password=?';
 
 User.login = (user, result) => {
@@ -43,18 +43,11 @@ User.create = (user, result) => {
 	const contents = [
 		tableName,
 		{
-			roles_id: 1,
-			name: user.name,
-			email: user.email,
-			password: user.password,
-			phone: user.phone,
-			gender: user.gender,
-			dateOfBirth: user.dateOfBirth,
-			picture: user.picture
+			...user
 		}
 	];
 
-	db.query(queryFindById, contentsValidate, (_err, res)=>{
+	db.query(queryValidateEmail, contentsValidate, (_err, res)=>{
 		if(!res.length){
 			db.query(queryInsert, contents,(err, res) => {
 				if(!err){
@@ -73,6 +66,15 @@ User.create = (user, result) => {
 
 User.findById = (id, result) => {
 	const contents = [
+		[
+			'name',
+			'email',
+			'phone',
+			'roles_id',
+			'gender',
+			'picture'
+		],
+		'dateOfBirth',
 		tableName,
 		{id: id}
 	];
@@ -93,21 +95,11 @@ User.findById = (id, result) => {
 User.update = (user, id, result) => {
 	const contents = [
 		tableName,
-		{
-			name: user.name,
-			email: user.email,
-			password: user.password,
-			phone: user.phone,
-			gender: user.gender,
-			dateOfBirth: user.dateOfBirth,
-			picture: user.picture
-		},
-		{
-			id: id
-		}
+		{...user},
+		{id: id}
 	];
 
-	db.query(queryUpdate, [contents], (err, res) => {
+	db.query(queryUpdate, contents, (err, res) => {
 		if(!err){
 			result(null, {...user});
 		}else{
@@ -121,7 +113,8 @@ User.findAll = (result) =>{
 		[
 			'name',
 			'email',
-			'gender',
+			'phone',
+			'roles_id',
 			'gender',
 			'picture'
 		],

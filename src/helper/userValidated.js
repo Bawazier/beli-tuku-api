@@ -7,6 +7,7 @@ const loginSchema = joi.object({
 });
 
 const userSchema = joi.object({
+	roles_id: joi.number().integer().positive().required(),
 	name: joi.string()
 		.min(3)
 		.max(30)
@@ -21,11 +22,12 @@ const userSchema = joi.object({
 
 	gender: joi.string().valid('male', 'female').lowercase().required(),
 
-	dateOfBirth: joi.date().max('1-1-2018').iso().required(),
+	dateOfBirth: joi.date().max('1-1-2018').required(),
 
 });
 
 const userUpdateSchema = joi.object({
+	roles_id: joi.number().integer().positive(),
 	name: joi.string()
 		.min(3)
 		.max(30),
@@ -39,20 +41,28 @@ const userUpdateSchema = joi.object({
 
 	gender: joi.string().valid('male', 'female').lowercase(),
 
-	dateOfBirth: joi.date().max('1-1-2018').iso()
+	dateOfBirth: joi.date().max('1-1-2018')
 });
 
 const productSchema = joi.object({
+	user_id: joi.number().integer().positive().required(),
+	category_id: joi.number().integer().positive().required(),
+	conditions_id: joi.number().integer().positive().required(),
 	name: joi.string().min(3).max(80).required(),
 	price: joi.number().integer().positive().required(),
-	categoryId: joi.number().integer().positive().required(),
+	stock: joi.number().integer().positive().required(),
+	maxSize: joi.number().integer().positive(),
 	description: joi.string()
 });
 
 const productUpdateSchema = joi.object({
+	user_id: joi.number().integer().positive(),
+	category_id: joi.number().integer().positive(),
+	conditions_id: joi.number().integer().positive(),
 	name: joi.string().min(3).max(30),
 	price: joi.number().integer().positive(),
-	categoryId: joi.number().integer().positive(),
+	stock: joi.number().integer().positive(),
+	maxSize: joi.number().integer().positive(),
 	description: joi.string()
 });
 
@@ -66,10 +76,21 @@ const cartUpdateSchema = joi.object({
 	quantity: joi.number().integer().positive().required()
 });
 
+const productImagesSchema = joi.number().integer().positive().required();
+const productColorsSchema = joi.object({
+	product_id: joi.number().integer().positive().required(),
+	color: joi.string().lowercase().required(),
+	status: joi.string().valid('available', 'empty').lowercase().required(),
+});
+const productColorsUpdateSchema = joi.object({
+	color: joi.string().lowercase(),
+	status: joi.string().valid('available', 'empty').lowercase(),
+});
+
 const globalSchema = joi.object({
 	name: joi.string().min(3).max(30),
 	status: joi.string().min(3).max(30),
-	role: joi.string().min(3).max(30)
+	role: joi.string().min(3).max(30),
 });
 
 const imagesSchema = joi.string().pattern(/\.(jpg|jpeg|png)$/);
@@ -83,5 +104,8 @@ module.exports = {
 	schemaUpdateCart: cartUpdateSchema,
 	schemaLogin: loginSchema,
 	schemaGlobal: globalSchema,
-	schemaImages: imagesSchema
+	schemaImages: imagesSchema,
+	schemaProductImages: productImagesSchema,
+	schemaProductColors: productColorsSchema,
+	schemaUpdateProductColors: productColorsUpdateSchema,
 };

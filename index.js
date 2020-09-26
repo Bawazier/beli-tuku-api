@@ -10,22 +10,17 @@ app.listen(process.env.PORT, () => {
 });
 
 //provide static file
-app.use('/product/uploads/img', express.static('assets/uploads'));
+app.use('/assets/uploads/', express.static('assets/uploads'));
 
-const productRouter = require('./src/routes/product');
-const categoryRouter = require('./src/routes/category');
-const userRouter = require('./src/routes/user');
-const cartRouter = require('./src/routes/cart');
-const conditionsRouter = require('./src/routes/conditions');
-const rolesRouter = require('./src/routes/roles');
+// const homeRouter = require('./src/routes/home');
+// const productRouter = require('./src/routes/product');
+// const customerRouter = require('./src/routes/customer');
+const sallerRouter = require('./src/routes/saller');
+// const adminRouter = require('./src/routes/admin');
 
 // attach member router
-app.use('/product', productRouter);
-app.use('/category', categoryRouter);
-app.use('/user', userRouter);
-app.use('/conditions', conditionsRouter);
-app.use('/roles', rolesRouter);
+app.use('/saller', sallerRouter);
 
 //Customer auth
-const customerAuth = require('./src/middlewares/auth');
-app.use('/cart', customerAuth, cartRouter);
+// const customerAuth = require('./src/middlewares/auth');
+// app.use('/cart', customerAuth, cartRouter);
