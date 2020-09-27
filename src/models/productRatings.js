@@ -103,6 +103,41 @@ Ratings.findByUserId = (id, result) => {
 	});
 };
 
+Ratings.findByProductId = (id, result) => {
+	const contents = [
+		[
+			'product_ratings.id',
+			'product_ratings.rating',
+			'product_ratings.product_id',
+			'products.name',
+			'product_ratings.user_id',
+			'user.name'
+		],
+		'product_ratings.created_at',
+		'product_ratings.updated_at',
+		tableName,
+		tableJoin[0],
+		'product_ratings.product_id',
+		'products.id',
+		tableJoin[1],
+		'product_ratings.user_id',
+		'user.id',
+		{'products.id': id}
+	];
+
+	db.query(queryFind, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
 Ratings.deleteByUserId = (id, result) => {
 	const contents = [
 		tableName,

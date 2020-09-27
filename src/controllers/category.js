@@ -47,8 +47,12 @@ module.exports = {
 
 	findAll: (req, res) => {
 		Category.findAll((err, data) => {
+			let newData = data.map(item => {
+				let images = {URL_image: process.env.URL + item.image};
+				return Object.assign({}, item, images);
+			});
 			if (!err) {
-				return responeStandart(res, 'SELECT ALL SUCCESS', { data });
+				return responeStandart(res, 'SELECT ALL SUCCESS', {newData});
 			} else {
 				console.log(err);
 				return responeStandart(res, 'SELECT ALL FAILLED', {}, 500, false);
