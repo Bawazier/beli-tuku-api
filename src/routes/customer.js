@@ -7,7 +7,6 @@ const cart = require('../controllers/cart');
 const uploadHelper = require('../helper/upload');
 
 router.get('/user/:id', user.findById);
-router.post('/user/', uploadHelper.single('picture'), user.create);
 router.patch('/user/:id', uploadHelper.single('picture'), user.update);
 router.delete('/user/:id', user.deleteById);
 

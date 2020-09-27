@@ -13,16 +13,18 @@ app.listen(process.env.PORT, () => {
 app.use('/assets/uploads/', express.static('assets/uploads'));
 
 // const homeRouter = require('./src/routes/home');
-const productRouter = require('./src/routes/product');
+const productRouter = require('./src/routes/products');
 const customerRouter = require('./src/routes/customer');
 const sallerRouter = require('./src/routes/saller');
+const loginRouter = require('./src/routes/login');
 // const adminRouter = require('./src/routes/admin');
 
 // attach member router
-app.use('/saller', sallerRouter);
-app.use('/customer', customerRouter);
+
 app.use('/products', productRouter);
+app.use('/user', loginRouter);
 
 //Customer auth
-// const customerAuth = require('./src/middlewares/auth');
-// app.use('/cart', customerAuth, cartRouter);
+const customerAuth = require('./src/middlewares/auth');
+app.use('/saller', customerAuth, sallerRouter);
+app.use('/customer', customerAuth, customerRouter);
