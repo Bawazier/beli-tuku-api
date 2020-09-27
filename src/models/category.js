@@ -18,8 +18,7 @@ Category.create = (category, result) => {
 	const contents = [
 		tableName,
 		{
-			name: category.name,
-			image: category.image
+			...category
 		}
 	];
 
@@ -46,16 +45,15 @@ Category.update = (category, id, result) => {
 	const contents = [
 		tableName,
 		{
-			name: category.name,
-			image: category.image
+			...category
 		},
 		{id: id}
 	];
 
 	db.query(queryUpdate, contents, (err, res) => {
 		if(!err){
-			if(res.length){
-				result(null, res);
+			if(res.affectedRows != 0){
+				result(null, {...category});
 			}else{
 				result({ kind: 'not_found' }, null);
 			}
@@ -73,7 +71,7 @@ Category.delete = (id, result) => {
 
 	db.query(queryDelete, contents, (err, res) => {
 		if(!err){
-			if(res.length){
+			if(res.affectedRows != 0){
 				result(null, res);
 			}else{
 				result({ kind: 'not_found' }, null);

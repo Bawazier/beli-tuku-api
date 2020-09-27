@@ -17,7 +17,7 @@ const productRouter = require('./src/routes/products');
 const customerRouter = require('./src/routes/customer');
 const sallerRouter = require('./src/routes/saller');
 const loginRouter = require('./src/routes/login');
-// const adminRouter = require('./src/routes/admin');
+const adminRouter = require('./src/routes/admin');
 
 // attach member router
 
@@ -29,3 +29,4 @@ app.use('/user', loginRouter);
 const customerAuth = require('./src/middlewares/auth');
 app.use('/saller', customerAuth, sallerRouter);
 app.use('/customer', customerAuth, customerRouter);
+app.use('/admin', customerAuth, adminRouter);

@@ -1,6 +1,7 @@
 const Category = require('../models/category');
 const schema = require('../helper/userValidated');
 const globalSchema = schema.schemaGlobal;
+const imagesSchema = schema.schemaImages;
 const responeStandart = require('../helper/respone');
 
 
@@ -8,9 +9,10 @@ module.exports = {
 	create: async (req, res) => {
 		try {
 			const result = await globalSchema.validateAsync(req.body);
+			const images = await imagesSchema.validateAsync(req.file.path);
 			const category = {
 				name: result.name,
-				image: req.file.path
+				image: images
 			};
 			Category.create(category, (err, data) => {
 				if (!err) {
@@ -28,15 +30,21 @@ module.exports = {
 	update: async (req, res) => {
 		try {
 			const result = await globalSchema.validateAsync(req.body);
+			const images = await imagesSchema.validateAsync(req.file.path);
 			const category = {
 				name: result.name,
-				image: req.file.path
+				image: images
 			};
+			let filteredObject = Object.keys(category).reduce((result, key) => {
+				if (category[key] !== undefined) result[key] = category[key];
+				return result;
+			}, {});
 
-			Category.update(category, req.params.id, (err, data) => {
+			Category.update(filteredObject, req.params.id, (err, data) => {
 				if (!err) {
 					return responeStandart(res, 'Update Data Success', { data });
 				} else {
+					console.log(err);
 					return responeStandart(res, 'Update Data Failled', {}, 500, false);
 				}
 			});
