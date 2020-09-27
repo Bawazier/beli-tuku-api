@@ -12,7 +12,7 @@ app.listen(process.env.PORT, () => {
 //provide static file
 app.use('/assets/uploads/', express.static('assets/uploads'));
 
-// const homeRouter = require('./src/routes/home');
+const homeRouter = require('./src/routes/home');
 const productRouter = require('./src/routes/products');
 const customerRouter = require('./src/routes/customer');
 const sallerRouter = require('./src/routes/saller');
@@ -21,6 +21,7 @@ const loginRouter = require('./src/routes/login');
 
 // attach member router
 
+app.use('/home', homeRouter);
 app.use('/products', productRouter);
 app.use('/user', loginRouter);
 

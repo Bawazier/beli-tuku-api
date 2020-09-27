@@ -27,8 +27,8 @@ const queryFind = 'SELECT ??, ?? AS saller_name, ?? AS category_name, ?? AS cond
 'FROM (?? INNER JOIN ?? ON ?? = ??) INNER JOIN ?? ON ?? = ?? INNER JOIN ?? ON ?? = ?? WHERE ?';
 const queryFindAll = 'SELECT ??, ?? AS saller_name, ?? AS category_name, ?? AS conditions_status, ' + 
 'DATE_FORMAT(??, "%d %M %Y") AS created_at, DATE_FORMAT(??, "%d %M %Y") AS updated_at ' + 
-'FROM (?? INNER JOIN ?? ON ?? = ??) INNER JOIN ?? ON ?? = ?? INNER JOIN ?? ON ?? = ?? WHERE ? LIKE %?%' +
-'ORDER BY ? ? LIMIT ? OFFSET ?';
+'FROM (?? INNER JOIN ?? ON ?? = ??) INNER JOIN ?? ON ?? = ?? INNER JOIN ?? ON ?? = ?? WHERE ?? LIKE ? ' +
+'ORDER BY ?? ASC LIMIT ? OFFSET ?';
 
 
 Product.create = (product, result) => {
@@ -105,6 +105,7 @@ Product.findById = (id, result) => {
 Product.findByUserId = (id, result) => {
 	const contents = [
 		[
+			'products.id',
 			'products.user_id',
 			'products.category_id',
 			'products.conditions_id',
@@ -148,24 +149,36 @@ Product.findByUserId = (id, result) => {
 Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
 	const contents = [
 		[
-			'user.name AS Custommer Name',
-			'category.name AS Category Product',
-			'condition.name AS Condition Product',
-			'product.name',
-			'product.price',
-			'product.stock',
-			'product.maxSize',
-			'product.created_at',
-			'product.updated_at',
-			'product.description',
+			'products.user_id',
+			'products.category_id',
+			'products.conditions_id',
+			'products.name',
+			'products.price',
+			'products.stock',
+			'products.maxSize',
+			'products.description',
 		],
-		[
-			`${tableName} INNER JOIN ${tableJoin[0]} ON product.category_id = category.id`,
-			`INNER JOIN ${tableJoin[1]} ON product.conditions_id = condition.id`,
-			`INNER JOIN ${tableJoin[2]} ON product.user_id = user.id`,
-			`WHERE ${searchKey} LIKE '%${searchValue}%' 
-			ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`,
-		]
+		'user.name',
+		'category.name',
+		'conditions.status',
+		'created_at',
+		'updated_at',
+		tableName,
+		tableJoin[2],
+		'products.user_id',
+		'user.id',
+		tableJoin[0],
+		'products.category_id',
+		'category.id',
+		tableJoin[1],
+		'products.conditions_id',
+		'conditions.id',
+		searchKey,
+		'%'+searchValue+'%',
+		'products.'+sortBy,
+		// sort,
+		limit,
+		offset
 	];
 	
 
