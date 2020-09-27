@@ -15,19 +15,35 @@ module.exports = {
 			const result = await loginSchema.validateAsync(req.body);
 			const user = {
 				email: result.email,
-				password: result.password,
+				roles_id: result.roles_id
 			};
-			User.login(user, (err, data) => {
-				if (!err && data.length) {
-					jwt.sign({ id: data[0].id }, process.env.PRIVATE_CODE, function (err, token) {
-						if (!err) {
-							return responeStandart(res, token, {});
-						} else {
-							return responeStandart(res, 'Login Gagal', {}, 403, false);
+
+			User.validateEmail(user, async (err, user) => {
+				try {
+					if (!err && user.length) {
+						const comparePass = await bcrypt.compareSync(result.password, user[0].password);
+						if (comparePass) {
+							User.login(user[0], (err, data) => {
+								if (!err && data.length) {
+									jwt.sign({ id: data[0].id }, process.env.PRIVATE_CODE, function (err, token) {
+										if (!err) {
+											return responeStandart(res, token, {});
+										} else {
+											return responeStandart(res, 'Login Gagal', {}, 403, false);
+										}
+									});
+								} else {
+									return responeStandart(res, 'Login Gagal', {}, 500, false);
+								}
+							});
+						}else {
+							return responeStandart(res, 'Wrong Password', {}, 400, false);
 						}
-					});
-				} else {
-					return responeStandart(res, 'Login Gagal', {}, 500, false);
+					} else {
+						return responeStandart(res, 'Login Gagal', {}, 500, false);
+					}
+				} catch (e) {
+					return responeStandart(res, e.details[0].message, {}, 400, false);
 				}
 			});
 		} catch (e) {
@@ -101,7 +117,7 @@ module.exports = {
 	findById: (req, res) => {
 		User.findById(req.params.id, (err, data) => {
 			if (!err) {
-				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data, pictureURL: process.env.URL+data[0].picture});
+				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data, pictureURL: process.env.URL + data[0].picture });
 			} else {
 				if (err.kind === 'not_found') {
 					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
@@ -129,7 +145,7 @@ module.exports = {
 	findAll: (req, res) => {
 		User.findAll((err, data) => {
 			if (!err) {
-				return responeStandart(res, 'SELECT ALL SUCCESS', { data, pictureURL: process.env.URL+data[0].picture });
+				return responeStandart(res, 'SELECT ALL SUCCESS', { data, pictureURL: process.env.URL + data[0].picture });
 			} else {
 				return responeStandart(res, 'SELECT ALL FAILLED', {}, 500, false);
 			}

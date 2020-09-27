@@ -20,12 +20,25 @@ const queryInsert = 'INSERT INTO ?? SET ?';
 const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
 const queryDelete = 'DELETE FROM ?? WHERE ?';
 const queryValidateEmail = 'SELECT * FROM ?? WHERE ?';
-const queryLogin = 'SELECT * FROM ?? WHERE email=? AND password=?';
+const queryLogin = 'SELECT * FROM ?? WHERE roles_id=?';
 
 User.login = (user, result) => {
-	const contents = [tableName, user.email, user.password];
+	const contents = [tableName, user.roles_id];
 
 	db.query(queryLogin, contents, 
+		(err, res) => {
+			if(!err){
+				result(null, res);
+			}else{
+				result(err, false);
+			}
+		});
+};
+
+User.validateEmail = (user, result) => {
+	const contents = [tableName, {email: user.email}];
+
+	db.query(queryValidateEmail, contents, 
 		(err, res) => {
 			if(!err){
 				result(null, res);
