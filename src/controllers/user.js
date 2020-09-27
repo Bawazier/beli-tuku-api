@@ -68,11 +68,14 @@ module.exports = {
 		try {
 			const result = await userUpdateSchema.validateAsync(req.body);
 			// const images = await imagesSchema.validateAsync(req.file.path);
+			const saltRounds = 10;
+			const salt = await bcrypt.genSaltSync(saltRounds);
+			const hash = await bcrypt.hashSync(result.password, salt);
 			const user = {
 				roles_id: result.roles_id,
 				name: result.name,
 				email: result.email,
-				password: result.password,
+				password: hash,
 				phone: result.phone,
 				gender: result.gender,
 				dateOfBirth: result.dateOfBirth,

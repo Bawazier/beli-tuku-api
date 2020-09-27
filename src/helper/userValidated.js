@@ -87,6 +87,33 @@ const productColorsUpdateSchema = joi.object({
 	status: joi.string().valid('available', 'empty').lowercase(),
 });
 
+const productRatingsSchema = joi.object({
+	product_id: joi.number().integer().positive().required(),
+	user_id: joi.number().integer().positive().required(),
+	rating: joi.number().integer().min(0).max(5).required(),
+});
+const productRatingsUpdateSchema = joi.object({
+	rating: joi.number().integer().min(0).max(5).required(),
+});
+
+const userAddressSchema = joi.object({
+	user_id: joi.number().integer().positive().required(),
+	name: joi.string().min(3).max(80).required(),
+	recipient_name: joi.string().min(3).max(80).required(),
+	recipient_tlp: joi.number().integer().required(),
+	address: joi.string().required(),
+	region: joi.string().required(),
+	postal_code: joi.number().integer().positive().required(),
+});
+const userAddressUpdateSchema = joi.object({
+	name: joi.string().min(3).max(80),
+	recipient_name: joi.string().min(3).max(80),
+	recipient_tlp: joi.number().integer(),
+	address: joi.string(),
+	region: joi.string(),
+	postal_code: joi.number().integer().positive(),
+});
+
 const globalSchema = joi.object({
 	name: joi.string().min(3).max(30),
 	status: joi.string().min(3).max(30),
@@ -108,4 +135,8 @@ module.exports = {
 	schemaProductImages: productImagesSchema,
 	schemaProductColors: productColorsSchema,
 	schemaUpdateProductColors: productColorsUpdateSchema,
+	schemaProductRatings: productRatingsSchema,
+	schemaUpdateProductRatings: productRatingsUpdateSchema,
+	schemaUserAddress: userAddressSchema,
+	schemaUpdateUserAddress: userAddressUpdateSchema,
 };

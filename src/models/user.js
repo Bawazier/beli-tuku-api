@@ -101,7 +101,11 @@ User.update = (user, id, result) => {
 
 	db.query(queryUpdate, contents, (err, res) => {
 		if(!err){
-			result(null, {...user});
+			if (res.affectedRows != 0) {
+				result(null, {...user});
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		}else{
 			result(err, res);
 		}
@@ -141,7 +145,11 @@ User.deleteById = (id, result) => {
 
 	db.query(queryDelete, contents, (err, res) => {
 		if(!err){
-			result(null, res);
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		}else{
 			result(err, null);
 		}

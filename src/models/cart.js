@@ -1,7 +1,7 @@
 const db = require('../helper/db');
 
-const tableName = '`cart`';
-const tableJoin = ['`product`', '`user`'];
+const tableName = 'cart';
+const tableJoin = ['products', 'user'];
 
 let totalPrice = 0;
 const Cart = function (cart) {
@@ -11,65 +11,103 @@ const Cart = function (cart) {
 	this.totalPrice = totalPrice;
 };
 
+// const queryFindAll = 'SELECT * FROM ??';
+const queryFind = 'SELECT ?? FROM ?? INNER JOIN ?? ON ?? = ?? WHERE ?';
+const queryInsert = 'INSERT INTO ?? SET ?';
+const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
+const queryDelete = 'DELETE FROM ?? WHERE ?';
+const queryValidate = 'SELECT * FROM ?? WHERE ?';
+
 Cart.create = (cart, result) => {
-	db.query(`SELECT user.id, product.id, product.price FROM ${tableJoin[0]}, ${tableJoin[1]} 
-	WHERE user.id=? AND product.id=?`, [cart.user_id, cart.product_id], (err, res) => {
+	const contentsValidate = [
+		tableJoin[0],
+		{ id: cart.product_id },
+	];
+	
+	db.query(queryValidate, contentsValidate, (err, res) => {
+		let total = cart.quantity * res[0].price;
+		const contents = [
+			tableName,
+			{
+				...cart,
+				totalPrice: total
+			}
+		];
 		if (res.length) {
-			cart.totalPrice = res[0].price * cart.quantity;
-			db.query(`INSERT INTO ${tableName} (user_id, product_id, quantity, totalPrice) 
-			VALUES (?,?,?,?)`, [cart.user_id, cart.product_id, cart.quantity, cart.totalPrice],
-			(err, res) => {
+			db.query(queryInsert, contents, (err) => {
 				if (!err) {
 					result(null, { ...cart });
 				} else {
-					result(err, res);
+					result(err, null);
+				}
+			});
+		} else {
+			result('Cart is not found', null);
+		}
+	});
+};
+
+Cart.update = (cart, id, result) => {
+	const contentsGetProductId = [
+		tableName,
+		{ id: id }
+	];
+	db.query(queryValidate, contentsGetProductId, (err, res) => {
+		if(!err){
+			const contentsValidate = [
+				tableJoin[0],
+				{ id: res[0].product_id },
+			];
+			db.query(queryValidate, contentsValidate, (err, res) => {
+				let total = cart.quantity * res[0].price;
+				const contents = [
+					tableName,
+					{
+						...cart,
+						totalPrice: total
+					},
+					{ id: id }
+				];
+				if (res.length) {
+					db.query(queryUpdate, contents, (err, res) => {
+						if (!err) {
+							if (res.affectedRows != 0) {
+								result(null, cart);
+							} else {
+								result({ kind: 'not_found' }, null);
+							}
+						} else {
+							result(err, null);
+						}
+					});
+				} else {
+					result('Cart is not found', null);
 				}
 			});
 		}else{
-			result('data not found', null);
+			result('Cart is not found', null);
 		}
 	});
 };
 
-Cart.updateQuantity = (cart, id, result) => {
-	db.query(`SELECT cart.id, product.price FROM ${tableName} INNER JOIN ${tableJoin[0]} 
-	ON cart.product_id = product.id WHERE cart.id = ?`, [id], (err, res) => {
-		if (res.length) {
-			cart.totalPrice = res[0].price * cart.quantity;
-			db.query(`UPDATE ${tableName} SET quantity=?, totalPrice=? WHERE id=?`,
-				[cart.quantity, cart.totalPrice, id],
-				(err, res) => {
-					if (!err) {
-						result(null, { ...cart });
-					} else {
-						result(err, res);
-					}
-				});
-		}else{
-			result('data not found', null);
-		}
-	});
-};
+Cart.findByUserId = (id, result) => {
+	const contents = [
+		[
+			'cart.id',
+			'cart.user_id',
+			'products.name',
+			'cart.quantity',
+			'products.price',
+			'cart.totalPrice',
+		],
+		tableName,
+		tableJoin[0],
+		'cart.product_id',
+		'products.id',
+		{ 'cart.user_id': id }
+	];
 
-Cart.updateById = (cart, id, result) => {
-	db.query(`UPDATE ${tableName} SET ${cart} WHERE id=?`,
-		[id],
-		(err, res) => {
-			if (!err) {
-				if (res.length) {
-					result(null, res);
-				} else {
-					result({ kind: 'not_found' }, null);
-				}
-			} else {
-				result(err, null);
-			}
-		});
-};
-
-Cart.findById = (id, result) => {
-	db.query('SELECT cart.id, user.name AS nameUser, product.name AS productName, product.price, cart.quantity, cart.totalPrice ' + 
-	'FROM cart INNER JOIN user ON cart.user_id = user.id INNER JOIN product ON cart.product_id = product.id WHERE cart.id=?', [id], (err, res) => {
+	db.query(queryFind, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -82,24 +120,54 @@ Cart.findById = (id, result) => {
 	});
 };
 
-
-
-Cart.findAll = (result) => {
-	db.query('SELECT cart.id, user.name AS nameUser, product.name AS productName, product.price, cart.quantity, cart.totalPrice ' + 
-	'FROM cart INNER JOIN user ON cart.user_id = user.id INNER JOIN product ON cart.product_id = product.id',
-	(err, res) => {
+Cart.deleteByUserId = (id, result) => {
+	const contents = [
+		tableName,
+		{ user_id: id }
+	];
+	db.query(queryDelete, contents, (err, res) => {
 		if (!err) {
-			result(null, res);
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		} else {
 			result(err, null);
 		}
 	});
 };
 
-Cart.deleteById = (id, result) => {
-	db.query(`DELETE FROM ${tableName} WHERE id = ?`, [id], (err, res) => {
+Cart.deleteByProductId = (id, result) => {
+	const contents = [
+		tableName,
+		{ product_id: id }
+	];
+	db.query(queryDelete, contents, (err, res) => {
 		if (!err) {
-			result(null, res);
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Cart.delete = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+	db.query(queryDelete, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		} else {
 			result(err, null);
 		}

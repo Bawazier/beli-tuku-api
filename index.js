@@ -14,12 +14,13 @@ app.use('/assets/uploads/', express.static('assets/uploads'));
 
 // const homeRouter = require('./src/routes/home');
 // const productRouter = require('./src/routes/product');
-// const customerRouter = require('./src/routes/customer');
+const customerRouter = require('./src/routes/customer');
 const sallerRouter = require('./src/routes/saller');
 // const adminRouter = require('./src/routes/admin');
 
 // attach member router
 app.use('/saller', sallerRouter);
+app.use('/customer', customerRouter);
 
 //Customer auth
 // const customerAuth = require('./src/middlewares/auth');
