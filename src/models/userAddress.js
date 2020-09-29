@@ -1,4 +1,5 @@
 const db = require('../helper/db');
+const query = require('../helper/sqlQuery');
 
 const tableName = 'user_address';
 const tableJoin = 'user';
@@ -13,13 +14,6 @@ const Address = function (address) {
 	this.postal_code = address.postal_code;
 };
 
-// const queryFindAll = 'SELECT * FROM ??';
-const queryFind = 'SELECT ?? FROM ?? WHERE ?';
-const queryInsert = 'INSERT INTO ?? SET ?';
-const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
-const queryDelete = 'DELETE FROM ?? WHERE ?';
-const queryValidate = 'SELECT * FROM ?? WHERE ?';
-
 Address.create = (address, result) => {
 	const contentsValidate = [
 		tableJoin,
@@ -32,9 +26,9 @@ Address.create = (address, result) => {
 		}
 	];
 
-	db.query(queryValidate, contentsValidate, (err, res) => {
+	db.query(query.findById, contentsValidate, (err, res) => {
 		if (res.length) {
-			db.query(queryInsert, contents, (err) => {
+			db.query(query.insert, contents, (err) => {
 				if (!err) {
 					result(null, { ...address });
 				} else {
@@ -53,10 +47,11 @@ Address.update = (address, id, result) => {
 		{
 			...address
 		},
-		{ id: id }
+		{ id: id },
+		{ user_id: address.user_id}
 	];
 
-	db.query(queryUpdate, contents, (err, res) => {
+	db.query(query.updateTwoCondition, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, address);
@@ -82,10 +77,10 @@ Address.findByUserId = (id, result) => {
 			'postal_code',
 		],
 		tableName,
-		{user_id: id}
+		{ user_id: id }
 	];
 
-	db.query(queryFind, contents, (err, res) => {
+	db.query(query.findById, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -101,9 +96,9 @@ Address.findByUserId = (id, result) => {
 Address.deleteByUserId = (id, result) => {
 	const contents = [
 		tableName,
-		{user_id: id}
+		{ user_id: id }
 	];
-	db.query(queryDelete, contents, (err, res) => {
+	db.query(query.delete, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, res);
@@ -119,9 +114,9 @@ Address.deleteByUserId = (id, result) => {
 Address.delete = (id, result) => {
 	const contents = [
 		tableName,
-		{id: id}
+		{ id: id }
 	];
-	db.query(queryDelete, contents, (err, res) => {
+	db.query(query.delete, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, res);

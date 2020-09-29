@@ -1,4 +1,5 @@
 const db = require('../helper/db');
+const query = require('../helper/sqlQuery');
 
 const tableName = 'user';
 
@@ -13,20 +14,14 @@ const User = function (user) {
 	this.picture = user.picture;
 };
 
-// const queryFindAll = 'SELECT * FROM ??';
+// custom query;
 const queryFindById = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ?? WHERE ?';
 const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
-const queryInsert = 'INSERT INTO ?? SET ?';
-const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
-const queryDelete = 'DELETE FROM ?? WHERE ?';
-const queryValidateEmail = 'SELECT * FROM ?? WHERE ?';
-const queryValidateLogin = 'SELECT * FROM ?? WHERE ? AND ?';
-const queryLogin = 'SELECT * FROM ??';
 
 User.login = (result) => {
 	const contents = [tableName];
 
-	db.query(queryLogin, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			result(null, res);
 		} else {
@@ -38,7 +33,7 @@ User.login = (result) => {
 User.validateEmail = (user, result) => {
 	const contents = [tableName, { email: user.email}, {roles_id: user.roles_id}];
 
-	db.query(queryValidateLogin, contents,
+	db.query(query.validateTwoCondition, contents,
 		(err, res) => {
 			if (!err) {
 				if (res.length) {
@@ -64,9 +59,9 @@ User.create = (user, result) => {
 		}
 	];
 
-	db.query(queryValidateEmail, contentsValidate, (err, res) => {
+	db.query(query.findById, contentsValidate, (err, res) => {
 		if (!res.length) {
-			db.query(queryInsert, contents, (err, res) => {
+			db.query(query.insert, contents, (err, res) => {
 				if (!err) {
 					result(null, { ...user });
 				} else {
@@ -119,9 +114,9 @@ User.update = (user, id, result) => {
 		{ id: id }
 	];
 
-	db.query(queryValidateEmail, contentsValidate, (err, res) => {
+	db.query(query.findById, contentsValidate, (err, res) => {
 		if (!res.length) {
-			db.query(queryUpdate, contents, (err, res) => {
+			db.query(query.update, contents, (err, res) => {
 				if (!err) {
 					if (res.affectedRows != 0) {
 						result(null, { ...user });
@@ -133,7 +128,7 @@ User.update = (user, id, result) => {
 				}
 			});
 		} else {
-			result(err, null);
+			result('Email Already Used', null);
 		}
 	});
 };
@@ -169,7 +164,7 @@ User.deleteById = (id, result) => {
 		}
 	];
 
-	db.query(queryDelete, contents, (err, res) => {
+	db.query(query.delete, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, res);
