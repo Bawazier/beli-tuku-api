@@ -25,7 +25,7 @@ module.exports = {
 						if (comparePass) {
 							User.login((err, data) => {
 								if (!err) {
-									jwt.sign({ id: data[0].id }, process.env.PRIVATE_CODE, function (err, token) {
+									jwt.sign({ id: user[0].id }, process.env.PRIVATE_CODE, function (err, token) {
 										if (!err) {
 											return responeStandart(res, token, {});
 										} else {

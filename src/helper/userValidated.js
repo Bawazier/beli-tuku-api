@@ -1,5 +1,28 @@
 const joi = require('joi');
 
+const profileAccount = joi.object({
+	name: joi.string()
+		.min(3)
+		.max(30),
+
+	email: joi.string().email(),
+
+	phone: joi.string().regex(/^\d{4}-\d{4}-\d{4}$/),
+
+	gender: joi.string().valid('male', 'female').lowercase(),
+
+	dateOfBirth: joi.date().max('1-1-2018'),
+});
+
+const profileAddress = joi.object({
+	name: joi.string().min(3).max(80),
+	recipient_name: joi.string().min(3).max(80),
+	recipient_tlp: joi.number().integer(),
+	address: joi.string(),
+	region: joi.string(),
+	postal_code: joi.number().integer().positive(),
+});
+
 const loginSchema = joi.object({
 	email: joi.string().email().required(),
 	password: joi.string()
@@ -140,4 +163,7 @@ module.exports = {
 	schemaUpdateProductRatings: productRatingsUpdateSchema,
 	schemaUserAddress: userAddressSchema,
 	schemaUpdateUserAddress: userAddressUpdateSchema,
+
+
+	profile : [profileAccount, profileAddress]
 };
