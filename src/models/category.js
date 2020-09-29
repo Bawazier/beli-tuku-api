@@ -34,7 +34,11 @@ Category.create = (category, result) => {
 Category.findAll = (result) => {
 	db.query(queryFindAll, [tableName], (err, res) => {
 		if(!err){
-			result(null, res);
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		}else{
 			result(err, null);
 		}

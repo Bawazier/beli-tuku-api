@@ -7,7 +7,9 @@ module.exports = (req, res, next) => {
 	if(authorization && authorization.startsWith('Bearer ')){
 		const token = authorization.slice(7, authorization.length);
 		try{
-			if(jwt.verify(token, process.env.PRIVATE_CODE)){
+			const user = jwt.verify(token, process.env.PRIVATE_CODE);
+			if(user){
+				req.user = user;
 				next();
 			}else{
 				return responeStandart(res, 'Unauthorization', {}, 401, false);

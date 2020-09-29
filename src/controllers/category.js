@@ -18,8 +18,7 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					console.log(err);
-					return responeStandart(res, 'Insert Data Failled', {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			});
 		} catch (err) {
@@ -44,8 +43,11 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Update Data Success', { data });
 				} else {
-					console.log(err);
-					return responeStandart(res, 'Update Data Failled', {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Category with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		} catch (err) {
@@ -62,8 +64,11 @@ module.exports = {
 			if (!err) {
 				return responeStandart(res, 'SELECT ALL SUCCESS', {newData});
 			} else {
-				console.log(err);
-				return responeStandart(res, 'SELECT ALL FAILLED', {}, 500, false);
+				if (err.kind === 'not_found') {
+					return responeStandart(res, `Not found Category ${req.params.id}.`, {}, 404, false);
+				} else {
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
+				}
 			}
 		});
 	},
@@ -74,9 +79,9 @@ module.exports = {
 				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Category with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					return responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});

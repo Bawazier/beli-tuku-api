@@ -15,13 +15,13 @@ module.exports = {
 			};
 			Cart.create(cart, (err, data) => {
 				if (!err) {
-					responeStandart(res, 'Insert Data Success', { data });
+					return responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					responeStandart(res, 'Insert Data Failled', {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			});
 		} catch (err) {
-			responeStandart(res, err.details[0].message, {}, 400, false);
+			return responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -33,25 +33,29 @@ module.exports = {
 			};
 			Cart.update(cart, req.params.id, (err, data) => {
 				if (!err) {
-					responeStandart(res, 'Update Data Success', { data });
+					return responeStandart(res, 'Update Data Success', { data });
 				} else {
-					responeStandart(res, 'Update Data Failled', {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found User with id ${req.params.id} in Cart.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		} catch (err) {
-			responeStandart(res, err.details[0].message, {}, 400, false);
+			return responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findByUserId: (req, res) => {
 		Cart.findByUserId(req.params.id, (err, data) => {
 			if (!err) {
-				responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
+				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Cart with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -60,12 +64,12 @@ module.exports = {
 	deleteByUserId: (req, res) => {
 		Cart.deleteByUserId(req.params.id, (err, data) => {
 			if(!err){
-				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found User with id ${req.params.id} in Cart.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -74,12 +78,12 @@ module.exports = {
 	deleteByProductId: (req, res) => {
 		Cart.deleteByProductId(req.params.id, (err, data) => {
 			if(!err){
-				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Product with id ${req.params.id} in Cart.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -88,12 +92,12 @@ module.exports = {
 	delete: (req, res) => {
 		Cart.delete(req.params.id, (err, data) => {
 			if(!err){
-				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Cart with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});

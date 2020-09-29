@@ -33,15 +33,27 @@ module.exports = {
 									}
 								});
 							}else{
-								return responeStandart(res, 'failled', {}, 500, false);
+								if (err.kind === 'not_found') {
+									return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+								} else {
+									return responeStandart(res, err.sqlMessage, {}, 500, false);
+								}
 							}
 						});
 					}else{
-						return responeStandart(res, 'failled', {}, 500, false);
+						if (err.kind === 'not_found') {
+							return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+						} else {
+							return responeStandart(res, err.sqlMessage, {}, 500, false);
+						}
 					}
 				});
 			}else{
-				return responeStandart(res, 'failled', {}, 500, false);
+				if (err.kind === 'not_found') {
+					return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+				} else {
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
+				}
 			}
 		});
 	},
@@ -92,8 +104,11 @@ module.exports = {
 					pageInfo
 				});
 			} else {
-				console.log(err);
-				responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+				if (err.kind === 'not_found') {
+					return responeStandart(res, `Not found Product ${req.params.id}.`, {}, 404, false);
+				} else {
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
+				}
 			}
 		});
 	},

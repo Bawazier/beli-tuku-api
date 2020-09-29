@@ -20,11 +20,11 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			});
 		}catch(e){
-			responeStandart(res, e.details[0].message, {}, 400, false);
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -39,11 +39,15 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Update Data Success', { data });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		}catch(e){
-			responeStandart(res, e.details[0].message, {}, 400, false);
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -53,11 +57,15 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Find By product Id Success', {data, pictureURL: process.env.URL+data[0].picture });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		}catch(e){
-			responeStandart(res, e.details[0].message, {}, 400, false);
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -67,11 +75,15 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Delete By product Id Success', { data });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		}catch(e){
-			responeStandart(res, e.details[0].message, {}, 400, false);
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -81,11 +93,15 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Delete image Success', { data });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Product Images with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		}catch(e){
-			responeStandart(res, e.details[0].message, {}, 400, false);
+			return responeStandart(res, e.details[0].message, {}, 400, false);
 		}
 	}
 };

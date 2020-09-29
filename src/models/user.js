@@ -20,29 +20,33 @@ const queryInsert = 'INSERT INTO ?? SET ?';
 const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
 const queryDelete = 'DELETE FROM ?? WHERE ?';
 const queryValidateEmail = 'SELECT * FROM ?? WHERE ?';
-const queryLogin = 'SELECT * FROM ?? WHERE roles_id=?';
+const queryValidateLogin = 'SELECT * FROM ?? WHERE ? AND ?';
+const queryLogin = 'SELECT * FROM ??';
 
-User.login = (user, result) => {
-	const contents = [tableName, user.roles_id];
+User.login = (result) => {
+	const contents = [tableName];
 
-	db.query(queryLogin, contents, 
-		(err, res) => {
-			if(!err){
-				result(null, res);
-			}else{
-				result(err, false);
-			}
-		});
+	db.query(queryLogin, contents, (err, res) => {
+		if (!err) {
+			result(null, res);
+		} else {
+			result(err, false);
+		}
+	});
 };
 
 User.validateEmail = (user, result) => {
-	const contents = [tableName, {email: user.email}];
+	const contents = [tableName, { email: user.email}, {roles_id: user.roles_id}];
 
-	db.query(queryValidateEmail, contents, 
+	db.query(queryValidateLogin, contents,
 		(err, res) => {
-			if(!err){
-				result(null, res);
-			}else{
+			if (!err) {
+				if (res.length) {
+					result(null, res);
+				} else {
+					result('Email already used', null);
+				}
+			} else {
 				result(err, false);
 			}
 		});
@@ -51,7 +55,7 @@ User.validateEmail = (user, result) => {
 User.create = (user, result) => {
 	const contentsValidate = [
 		tableName,
-		{email: user.email}
+		{ email: user.email }
 	];
 	const contents = [
 		tableName,
@@ -60,21 +64,20 @@ User.create = (user, result) => {
 		}
 	];
 
-	db.query(queryValidateEmail, contentsValidate, (_err, res)=>{
-		if(!res.length){
-			db.query(queryInsert, contents,(err, res) => {
-				if(!err){
+	db.query(queryValidateEmail, contentsValidate, (err, res) => {
+		if (!res.length) {
+			db.query(queryInsert, contents, (err, res) => {
+				if (!err) {
 					result(null, { ...user });
-				}else{
-					console.log(err);
-					result('Insert Data Failled', res);
+				} else {
+					result(err, res);
 				}
 			});
-		}else{
+		} else {
 			result('Email already used', null);
 		}
 	});
-	
+
 };
 
 User.findById = (id, result) => {
@@ -89,43 +92,53 @@ User.findById = (id, result) => {
 		],
 		'dateOfBirth',
 		tableName,
-		{id: id}
+		{ id: id }
 	];
 
 	db.query(queryFindById, contents, (err, res) => {
-		if(!err) {
-			if(res.length){
+		if (!err) {
+			if (res.length) {
 				result(null, res);
-			}else{
+			} else {
 				result({ kind: 'not_found' }, null);
 			}
-		}else{
+		} else {
 			result(err, null);
 		}
 	});
 };
 
 User.update = (user, id, result) => {
+	const contentsValidate = [
+		tableName,
+		{ email: user.email }
+	];
 	const contents = [
 		tableName,
-		{...user},
-		{id: id}
+		{ ...user },
+		{ id: id }
 	];
 
-	db.query(queryUpdate, contents, (err, res) => {
-		if(!err){
-			if (res.affectedRows != 0) {
-				result(null, {...user});
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		}else{
-			result(err, res);
+	db.query(queryValidateEmail, contentsValidate, (err, res) => {
+		if (!res.length) {
+			db.query(queryUpdate, contents, (err, res) => {
+				if (!err) {
+					if (res.affectedRows != 0) {
+						result(null, { ...user });
+					} else {
+						result({ kind: 'not_found' }, null);
+					}
+				} else {
+					result(err, res);
+				}
+			});
+		} else {
+			result(err, null);
 		}
 	});
 };
 
-User.findAll = (result) =>{
+User.findAll = (result) => {
 	const contents = [
 		[
 			'name',
@@ -140,9 +153,9 @@ User.findAll = (result) =>{
 	];
 
 	db.query(queryFind, contents, (err, res) => {
-		if(!err){
+		if (!err) {
 			result(null, res);
-		}else{
+		} else {
 			result(err, null);
 		}
 	});
@@ -157,13 +170,13 @@ User.deleteById = (id, result) => {
 	];
 
 	db.query(queryDelete, contents, (err, res) => {
-		if(!err){
+		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, res);
 			} else {
 				result({ kind: 'not_found' }, null);
 			}
-		}else{
+		} else {
 			result(err, null);
 		}
 	});

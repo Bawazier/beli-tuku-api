@@ -33,7 +33,11 @@ Conditions.create = (conditions, result) => {
 Conditions.findAll = (result) => {
 	db.query(queryFindAll, [tableName], (err, res) => {
 		if(!err){
-			result(null, res);
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		}else{
 			result(err, null);
 		}
@@ -51,8 +55,8 @@ Conditions.update = (conditions, id, result) => {
 
 	db.query(queryUpdate, contents, (err, res) => {
 		if(!err){
-			if(res.length){
-				result(null, res);
+			if(res.affectedRows != 0){
+				result(null, {...conditions});
 			}else{
 				result({ kind: 'not_found' }, null);
 			}
@@ -70,7 +74,7 @@ Conditions.delete = (id, result) => {
 
 	db.query(queryDelete, contents, (err, res) => {
 		if(!err){
-			if(res.length){
+			if(res.affectedRows != 0){
 				result(null, res);
 			}else{
 				result({ kind: 'not_found' }, null);

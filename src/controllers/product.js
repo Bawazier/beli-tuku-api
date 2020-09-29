@@ -25,13 +25,13 @@ module.exports = {
 			});
 			Product.create(product, (err, data) => {
 				if (!err) {
-					responeStandart(res, 'Insert Data Success', { data });
+					return responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					responeStandart(res, err, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			});
 		} catch (err) {
-			responeStandart(res, err.details[0].message, {}, 400, false);
+			return responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
@@ -56,30 +56,30 @@ module.exports = {
 			
 			Product.update(filteredObject, req.params.id, (err, data) => {
 				if (!err) {
-					responeStandart(res, `Update Data By Id ${req.params.id} Success`, { data });
+					return responeStandart(res, `Update Data By Id ${req.params.id} Success`, { data });
 
 				} else {
 					if (err.kind === 'not_found') {
-						responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+						return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
 					} else {
-						responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
 					}
 				}
 			});
 		} catch (err) {
-			responeStandart(res, err.details[0].message, {}, 400, false);
+			return responeStandart(res, err.details[0].message, {}, 400, false);
 		}
 	},
 
 	findById: (req, res) => {
 		Product.findById(req.params.id, (err, data) => {
 			if (!err) {
-				responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
+				return responeStandart(res, `SELECT BY ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Product with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -88,12 +88,12 @@ module.exports = {
 	findByUserId: (req, res) => {
 		Product.findByUserId(req.params.id, (err, data) => {
 			if (!err) {
-				responeStandart(res, `SELECT BY User ID ${req.params.id} Success`, { data });
+				return responeStandart(res, `SELECT BY User ID ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found User with id ${req.params.id} in product.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -102,12 +102,12 @@ module.exports = {
 	deleteById: (req, res) => {
 		Product.deleteById(req.params.id, (err, data) => {
 			if(!err){
-				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found product with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -116,12 +116,12 @@ module.exports = {
 	deleteByUserId: (req, res) => {
 		Product.deleteByUserId(req.params.id, (err, data) => {
 			if(!err){
-				responeStandart(res, `Delete ${req.params.id} Success`, { data });
+				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			}else{
 				if (err.kind === 'not_found') {
-					responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found User with id ${req.params.id} in product.`, {}, 404, false);
 				} else {
-					responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});

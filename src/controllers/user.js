@@ -23,27 +23,27 @@ module.exports = {
 					if (!err && user.length) {
 						const comparePass = await bcrypt.compareSync(result.password, user[0].password);
 						if (comparePass) {
-							User.login(user[0], (err, data) => {
-								if (!err && data.length) {
+							User.login((err, data) => {
+								if (!err) {
 									jwt.sign({ id: data[0].id }, process.env.PRIVATE_CODE, function (err, token) {
 										if (!err) {
 											return responeStandart(res, token, {});
 										} else {
-											return responeStandart(res, 'Login Gagal', {}, 403, false);
+											return responeStandart(res, err, {}, 403, false);
 										}
 									});
 								} else {
-									return responeStandart(res, 'Login Gagal', {}, 500, false);
+									return responeStandart(res, err.sqlMessage, {}, 500, false);
 								}
 							});
 						}else {
 							return responeStandart(res, 'Wrong Password', {}, 400, false);
 						}
 					} else {
-						return responeStandart(res, 'Login Gagal', {}, 500, false);
+						return responeStandart(res, 'Wrong Email', {}, 500, false);
 					}
 				} catch (e) {
-					return responeStandart(res, e.details[0].message, {}, 400, false);
+					return responeStandart(res, e, {}, 400, false);
 				}
 			});
 		} catch (e) {

@@ -23,7 +23,7 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Insert Data Success', { data });
 				} else {
-					return responeStandart(res, err, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			});
 		} catch (e) {
@@ -52,7 +52,11 @@ module.exports = {
 				if (!err) {
 					return responeStandart(res, 'Update Data Success', { data });
 				} else {
-					return responeStandart(res, 'Update Data Failled', {}, 500, false);
+					if (err.kind === 'not_found') {
+						return responeStandart(res, `Not found Address with id ${req.params.id}.`, {}, 404, false);
+					} else {
+						return responeStandart(res, err.sqlMessage, {}, 500, false);
+					}
 				}
 			});
 		} catch (e) {
@@ -68,7 +72,7 @@ module.exports = {
 				if (err.kind === 'not_found') {
 					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					return responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -82,7 +86,7 @@ module.exports = {
 				if (err.kind === 'not_found') {
 					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					return responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
@@ -94,9 +98,9 @@ module.exports = {
 				return responeStandart(res, `Delete ${req.params.id} Success`, { data });
 			} else {
 				if (err.kind === 'not_found') {
-					return responeStandart(res, `Not found User with id ${req.params.id}.`, {}, 404, false);
+					return responeStandart(res, `Not found Address with id ${req.params.id}.`, {}, 404, false);
 				} else {
-					return responeStandart(res, `Error retrieving User with id ${req.params.id}.`, {}, 500, false);
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
 				}
 			}
 		});
