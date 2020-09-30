@@ -20,8 +20,10 @@ const loginRouter = require('./src/routes/login');
 const adminRouter = require('./src/routes/admin');
 
 const profile = require('./src/routes/profile');
+const auth = require('./src/routes/auth');
 
 // attach member router
+app.use('/auth', auth);
 
 app.use('/home', homeRouter);
 app.use('/products', productRouter);

@@ -12,6 +12,8 @@ const profileAccount = joi.object({
 	gender: joi.string().valid('male', 'female').lowercase(),
 
 	dateOfBirth: joi.date().max('1-1-2018'),
+	password: joi.string()
+		.pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
 });
 
 const profileAddress = joi.object({
@@ -27,7 +29,7 @@ const loginSchema = joi.object({
 	email: joi.string().email().required(),
 	password: joi.string()
 		.pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
-	roles_id: joi.number().integer().positive().required(),
+	roles_id: joi.string().lowercase().required(),
 });
 
 const userSchema = joi.object({
@@ -165,5 +167,5 @@ module.exports = {
 	schemaUpdateUserAddress: userAddressUpdateSchema,
 
 
-	profile : [profileAccount, profileAddress]
+	profile : [profileAccount, profileAddress, loginSchema]
 };
