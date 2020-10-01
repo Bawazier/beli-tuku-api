@@ -102,15 +102,14 @@ const imagesSchema = joi.string().pattern(/\.(jpg|jpeg|png)$/);
 module.exports = {
 	User: [userSchema, imagesSchema],
 	Product: productSchema,
-	category: [name, imagesSchema],
-	conditions: status,
-	roles: role,
-	productImages : [id, imagesSchema],
+	Category: [name, imagesSchema],
+	Conditions: status,
+	Roles: role,
+	ProductImages : [id, imagesSchema],
 	Cart: [cartSchema, cartUpdateSchema],
 	Login: loginSchema,
 	ProductColors: productColorsSchema,
 	ProductRatings: productRatingsSchema,
 	UserAddress: userAddressSchema,
-	address: userAddressSchema,
 	profile : [profileAccount, profileAddress, loginSchema]
 };
