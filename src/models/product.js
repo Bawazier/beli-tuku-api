@@ -1,53 +1,135 @@
-/* eslint-disable no-unused-vars */
 const db = require('../helper/db');
+const query = require('../helper/sqlQuery');
 
 const tableName = 'products';
 const tableJoin = ['category', 'conditions', 'user'];
 
-const Product = function (product) {
-	this.user_id = product.user_id;
-	this.category_id = product.category_id;
-	this.conditions_id = product.conditions_id;
-	this.name = product.name;
-	this.price = product.price;
-	this.stock = product.stock;
-	this.maxSize = product.maxSize;
-	this.created_at = product.created_at;
-	this.updated_at = product.updated_at;
-	this.description = product.description;
+const Products = function (products) {
+	this.user_id = products.user_id;
+	this.category_id = products.category_id;
+	this.conditions_id = products.conditions_id;
+	this.name = products.name;
+	this.price = products.price;
+	this.stock = products.stock;
+	this.maxSize = products.maxSize;
+	this.created_at = products.created_at;
+	this.updated_at = products.updated_at;
+	this.description = products.description;
 };
 
+Products.create = (products, result) => {
+	const contents = [
+		tableName,
+		{
+			...products
+		}
+	];
 
-const queryFindById = 'SELECT * FROM ?? WHERE ?';
-const queryInsert = 'INSERT INTO ?? SET ?';
-const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
-const queryDelete = 'DELETE FROM ?? WHERE ?';
-const queryFind = 'SELECT ??, ?? AS saller_name, ?? AS category_name, ?? AS conditions_status, ' + 
-'DATE_FORMAT(??, "%d %M %Y") AS created_at, DATE_FORMAT(??, "%d %M %Y") AS updated_at ' + 
-'FROM (?? INNER JOIN ?? ON ?? = ??) INNER JOIN ?? ON ?? = ?? INNER JOIN ?? ON ?? = ?? WHERE ?';
-const queryFindAll = 'SELECT ??, ?? AS saller_name, ?? AS category_name, ?? AS conditions_status, ' + 
-'DATE_FORMAT(??, "%d %M %Y") AS created_at, DATE_FORMAT(??, "%d %M %Y") AS updated_at ' + 
-'FROM (?? INNER JOIN ?? ON ?? = ??) INNER JOIN ?? ON ?? = ?? INNER JOIN ?? ON ?? = ?? WHERE ?? LIKE ? ' +
-'ORDER BY ?? ASC LIMIT ? OFFSET ?';
+	db.query(query.insert, contents, (err) => {
+		if (!err) {
+			result(null, { ...products });
+		} else {
+			result(err, null);
+		}
+	});
+};
 
+Products.update = (products, id, result) => {
+	const contents = [
+		tableName,
+		{
+			...products
+		},
+		{ id: id },
+	];
 
-Product.create = (product, result) => {
+	db.query(query.update, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, products);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.findById = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.findAll = (id, result) => {
+	const contents = [
+		tableName
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.delete = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+	db.query(query.delete, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+//Custom
+
+Products.createByValidated = (products, result) => {
 	const contentsValidate = [
 		tableJoin[0],
-		{ id: product.category_id }
+		{ id: products.category_id }
 	];
 	const contents = [
 		tableName,
 		{
-			...product
+			...products
 		}
 	];
 
-	db.query(queryFindById, contentsValidate, (err, res) => {
+	db.query(query.findById, contentsValidate, (err, res) => {
 		if (res.length) {
-			db.query(queryInsert, contents, (err) => {
+			db.query(query.insert, contents, (err) => {
 				if (!err) {
-					result(null, { ...product });
+					result(null, { ...products });
 				} else {
 					result(err, null);
 				}
@@ -59,7 +141,7 @@ Product.create = (product, result) => {
 
 };
 
-Product.findById = (id, result) => {
+Products.customFindById = (id, result) => {
 	const contents = [
 		[
 			'products.user_id',
@@ -70,12 +152,12 @@ Product.findById = (id, result) => {
 			'products.stock',
 			'products.maxSize',
 			'products.description',
+			'user.name AS nameUser',
+			'category.name AS nameCategory',
+			'conditions.status AS condition',
+			'DATE_FORMAT(created_at, "%d %M %Y")',
+			'DATE_FORMAT(updated_at, "%d %M %Y")',
 		],
-		'user.name',
-		'category.name',
-		'conditions.status',
-		'created_at',
-		'updated_at',
 		tableName,
 		tableJoin[2],
 		'products.user_id',
@@ -89,7 +171,7 @@ Product.findById = (id, result) => {
 		{'products.id': id}
 	];
 
-	db.query(queryFind, contents, (err, res) => {
+	db.query(query.findJoinThirdTable, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -102,7 +184,7 @@ Product.findById = (id, result) => {
 	});
 };
 
-Product.findByUserId = (id, result) => {
+Products.findByUserId = (id, result) => {
 	const contents = [
 		[
 			'products.id',
@@ -114,12 +196,12 @@ Product.findByUserId = (id, result) => {
 			'products.stock',
 			'products.maxSize',
 			'products.description',
+			'user.name AS nameUser',
+			'category.name AS nameCategory',
+			'conditions.status AS condition',
+			'DATE_FORMAT(created_at, "%d %M %Y")',
+			'DATE_FORMAT(updated_at, "%d %M %Y")',
 		],
-		'user.name',
-		'category.name',
-		'conditions.status',
-		'created_at',
-		'updated_at',
 		tableName,
 		tableJoin[2],
 		'products.user_id',
@@ -133,7 +215,7 @@ Product.findByUserId = (id, result) => {
 		{'user.id': id}
 	];
 
-	db.query(queryFind, contents, (err, res) => {
+	db.query(query.findJoinThirdTable, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -146,7 +228,7 @@ Product.findByUserId = (id, result) => {
 	});
 };
 
-Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
+Products.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
 	const contents = [
 		[
 			'products.user_id',
@@ -157,12 +239,12 @@ Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) 
 			'products.stock',
 			'products.maxSize',
 			'products.description',
+			'user.name AS nameUser',
+			'category.name AS nameCategory',
+			'conditions.status AS condition',
+			'DATE_FORMAT(created_at, "%d %M %Y")',
+			'DATE_FORMAT(updated_at, "%d %M %Y")',
 		],
-		'user.name',
-		'category.name',
-		'conditions.status',
-		'created_at',
-		'updated_at',
 		tableName,
 		tableJoin[2],
 		'products.user_id',
@@ -182,7 +264,7 @@ Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) 
 	];
 	
 
-	db.query(queryFindAll, contents, (err, res) => {
+	db.query(query.findJoinThirdWithLimit, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				db.query(`SELECT COUNT(*) AS count FROM ${tableName} WHERE ${searchKey} LIKE '%${searchValue}%'`,
@@ -198,52 +280,12 @@ Product.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) 
 	});
 };
 
-Product.update = (product, id, result) => {
-	const contents = [
-		tableName,
-		{
-			...product
-		},
-		{ id: id }
-	];
-
-	db.query(queryUpdate, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, product);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Product.deleteById = (id, result) => {
-	const contents = [
-		tableName,
-		{id: id}
-	];
-	db.query(queryDelete, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Product.deleteByUserId = (id, result) => {
+Products.deleteByUserId = (id, result) => {
 	const contents = [
 		tableName,
 		{user_id: id}
 	];
-	db.query(queryDelete, contents, (err, res) => {
+	db.query(query.delete, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
 				result(null, res);
@@ -256,4 +298,4 @@ Product.deleteByUserId = (id, result) => {
 	});
 };
 
-module.exports = Product;
+module.exports = Products;

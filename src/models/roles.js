@@ -1,4 +1,5 @@
 const db = require('../helper/db');
+const query = require('../helper/sqlQuery');
 
 const tableName = 'roles';
 
@@ -6,39 +7,18 @@ const Roles = function (roles) {
 	this.role = roles.role;
 };
 
-const queryFindAll = 'SELECT * FROM ??';
-// const queryFindById = 'SELECT * FROM ?? WHERE ?';
-// const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
-const queryInsert = 'INSERT INTO ?? SET ?';
-const queryUpdate = 'UPDATE ?? SET ? WHERE ?';
-const queryDelete = 'DELETE FROM ?? WHERE ?';
-
 Roles.create = (roles, result) => {
 	const contents = [
 		tableName,
 		{
-			role: roles.role
+			...roles
 		}
 	];
 
-	db.query(queryInsert, contents, (err) => {
-		if(!err){
+	db.query(query.insert, contents, (err) => {
+		if (!err) {
 			result(null, { ...roles });
-		}else{
-			result(err, null);
-		}
-	});
-};
-
-Roles.findAll = (result) => {
-	db.query(queryFindAll, [tableName], (err, res) => {
-		if(!err){
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		}else{
+		} else {
 			result(err, null);
 		}
 	});
@@ -48,19 +28,56 @@ Roles.update = (roles, id, result) => {
 	const contents = [
 		tableName,
 		{
-			role: roles.role
+			...roles
 		},
-		{id: id}
+		{ id: id },
 	];
 
-	db.query(queryUpdate, contents, (err, res) => {
-		if(!err){
-			if(res.affectedRows != 0){
-				result(null, {...roles});
-			}else{
+	db.query(query.update, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, roles);
+			} else {
 				result({ kind: 'not_found' }, null);
 			}
-		}else{
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Roles.findById = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Roles.findAll = (id, result) => {
+	const contents = [
+		tableName
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
 			result(err, null);
 		}
 	});
@@ -69,17 +86,16 @@ Roles.update = (roles, id, result) => {
 Roles.delete = (id, result) => {
 	const contents = [
 		tableName,
-		{id: id}
+		{ id: id }
 	];
-
-	db.query(queryDelete, contents, (err, res) => {
-		if(!err){
-			if(res.affectedRows != 0){
+	db.query(query.delete, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
 				result(null, res);
-			}else{
+			} else {
 				result({ kind: 'not_found' }, null);
 			}
-		}else{
+		} else {
 			result(err, null);
 		}
 	});

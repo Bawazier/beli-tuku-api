@@ -14,26 +14,107 @@ const User = function (user) {
 	this.picture = user.picture;
 };
 
-// custom query;
-const queryFindById = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ?? WHERE ?';
-const queryFind = 'SELECT ??, DATE_FORMAT(??, "%d %M %Y") AS dateOfBirth FROM ??';
+User.create = (user, result) => {
+	const contents = [
+		tableName,
+		{
+			...user
+		}
+	];
 
-User.login = (result) => {
-	const contents = [tableName];
-
-	db.query(query.findAll, contents, (err, res) => {
+	db.query(query.insert, contents, (err) => {
 		if (!err) {
-			result(null, res);
+			result(null, { ...user });
 		} else {
-			result(err, false);
+			result(err, null);
 		}
 	});
 };
 
-User.validateEmail = (user, result) => {
+User.update = (user, id, result) => {
+	const contents = [
+		tableName,
+		{
+			...user
+		},
+		{ id: id },
+	];
+
+	db.query(query.update, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, user);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+User.findById = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+User.findAll = (id, result) => {
+	const contents = [
+		tableName
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+User.delete = (id, result) => {
+	const contents = [
+		tableName,
+		{ id: id }
+	];
+	db.query(query.delete, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+
+//Custom
+
+User.login = (user, result) => {
 	const contents = [tableName, { email: user.email}, {roles_id: user.roles_id}];
 
-	db.query(query.validateTwoCondition, contents,
+	db.query(query.validateSecondCondition, contents,
 		(err, res) => {
 			if (!err) {
 				if (res.length) {
@@ -47,7 +128,7 @@ User.validateEmail = (user, result) => {
 		});
 };
 
-User.create = (user, result) => {
+User.createUser = (user, result) => {
 	const contentsValidate = [
 		tableName,
 		{ email: user.email }
@@ -75,35 +156,7 @@ User.create = (user, result) => {
 
 };
 
-User.findById = (id, result) => {
-	const contents = [
-		[
-			'name',
-			'email',
-			'phone',
-			'roles_id',
-			'gender',
-			'picture'
-		],
-		'dateOfBirth',
-		tableName,
-		{ id: id }
-	];
-
-	db.query(queryFindById, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-User.update = (user, id, result) => {
+User.updateUser = (user, id, result) => {
 	const contentsValidate = [
 		tableName,
 		{ email: user.email }
@@ -133,44 +186,49 @@ User.update = (user, id, result) => {
 	});
 };
 
-User.findAll = (result) => {
+User.customFindById = (id, result) => {
 	const contents = [
 		[
 			'name',
 			'email',
 			'phone',
-			'roles_id',
 			'gender',
+			'DATE_FORMAT(dateOfBirth, "%d %M %Y") AS dateOfBirth',
 			'picture'
 		],
-		'dateOfBirth',
 		tableName,
+		{ id: id }
 	];
 
-	db.query(queryFind, contents, (err, res) => {
+	db.query(query.customFindById, contents, (err, res) => {
 		if (!err) {
-			result(null, res);
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
 		} else {
 			result(err, null);
 		}
 	});
 };
 
-User.deleteById = (id, result) => {
+User.customFindAll = (result) => {
 	const contents = [
+		[
+			'name',
+			'email',
+			'phone',
+			'gender',
+			'picture',
+			'DATE_FORMAT(dateOfBirth, "%d %M %Y") AS dateOfBirth',
+		],
 		tableName,
-		{
-			id: id
-		}
 	];
 
-	db.query(query.delete, contents, (err, res) => {
+	db.query(query.customFindAll, contents, (err, res) => {
 		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
+			result(null, res);
 		} else {
 			result(err, null);
 		}
