@@ -1,8 +1,10 @@
 const router = require('express').Router();
-const products = require('../controllers/products');
-const category = require('../controllers/category');
+const home = require('../controllers/home');
 
-router.get('/products/', products.findAll);
-router.get('/category/', category.findAll);
+router.get('/products/search', home.findProductBySearch);
+router.get('/category', home.findCategory);
+router.get('/products/category/:id', home.findProductByCategoryId);
+router.get('/products/new', home.findProductSortByCreatedAt);
+router.get('/products/populer', home.findProductSortByRatings);
 
 module.exports = router;

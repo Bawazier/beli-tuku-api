@@ -1,33 +1,20 @@
 const router = require('express').Router();
-const user = require('../controllers/user');
-const userAddress = require('../controllers/userAddress');
-const productRatings = require('../controllers/productRatings');
+const profile = require('../controllers/profile');
 const cart = require('../controllers/cart');
+const address = require('../controllers/address');
 
-const uploadHelper = require('../helper/upload');
+router.get('/profile/account', profile.findAccountById);
+router.patch('/profile/account', profile.updateAccountById);
+router.put('/profile/account', profile.updateAccountAllById);
 
-router.get('/user/:id', user.findById);
-router.patch('/user/:id', uploadHelper.single('picture'), user.update);
-router.delete('/user/:id', user.deleteById);
+router.get('/address', address.findAddressByUserId);
+router.post('/address', address.createAddressByUserId);
+router.patch('/address/:id', address.updateAddressByUserId);
+router.put('/address/:id', address.updateAddressAllByUserId);
 
-router.get('/address/user/:id', userAddress.findByUserId);
-router.post('/address/', userAddress.create);
-router.patch('/address/:id', userAddress.update);
-router.delete('/address/:id', userAddress.delete);
-router.delete('/address/user/:id', userAddress.deleteByUserId);
-
-router.get('/cart/user/:id', cart.findByUserId);
-router.post('/cart/', cart.create);
-router.patch('/cart/:id', cart.update);
-router.delete('/cart/:id', cart.delete);
-router.delete('/cart/product/:id', cart.deleteByProductId);
-router.delete('/cart/user/:id', cart.deleteByUserId);
-
-router.get('/ratings/user/:id', productRatings.findByUserId);
-router.post('/ratings/', productRatings.create);
-router.patch('/ratings/:id', productRatings.update);
-router.delete('/ratings/:id', productRatings.delete);
-router.delete('/ratings/user/:id', productRatings.deleteByUserId);
-router.delete('/ratings/product/:id', productRatings.deleteByProductId);
+router.get('/cart', cart.findByStatusIn);
+router.get('/chekout', cart.findByStatusOut);
+router.post('/cart', cart.addCart);
+router.patch('/cart', cart.createCart);
 
 module.exports = router;
