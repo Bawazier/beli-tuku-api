@@ -72,12 +72,12 @@ User.findById = (id, result) => {
 	});
 };
 
-User.findAll = (id, result) => {
+User.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -110,7 +110,7 @@ User.delete = (id, result) => {
 
 
 //Custom
-
+//	START DB FOR AUTH ROUTES
 User.login = (user, result) => {
 	const contents = [tableName, { email: user.email}, {roles_id: user.roles_id}];
 
@@ -128,7 +128,7 @@ User.login = (user, result) => {
 		});
 };
 
-User.createUser = (user, result) => {
+User.createByValidated = (user, result) => {
 	const contentsValidate = [
 		tableName,
 		{ email: user.email }
@@ -155,8 +155,10 @@ User.createUser = (user, result) => {
 	});
 
 };
+//	END DB FOR AUTH ROUTES
 
-User.updateUser = (user, id, result) => {
+//	START DB FOR PROFILE ROUTES
+User.updateByUserId = (user, id, result) => {
 	const contentsValidate = [
 		tableName,
 		{ email: user.email }
@@ -172,7 +174,7 @@ User.updateUser = (user, id, result) => {
 			db.query(query.update, contents, (err, res) => {
 				if (!err) {
 					if (res.affectedRows != 0) {
-						result(null, { ...user });
+						result(null, {});
 					} else {
 						result({ kind: 'not_found' }, null);
 					}
@@ -181,19 +183,19 @@ User.updateUser = (user, id, result) => {
 				}
 			});
 		} else {
-			result('Email Already Used', null);
+			result({ kind: 'Email Already Used' }, null);
 		}
 	});
 };
 
-User.customFindById = (id, result) => {
+User.findByUserId = (id, result) => {
 	const contents = [
 		[
 			'name',
 			'email',
 			'phone',
 			'gender',
-			'DATE_FORMAT(dateOfBirth, "%d %M %Y") AS dateOfBirth',
+			'dateOfBirth',
 			'picture'
 		],
 		tableName,
@@ -212,7 +214,23 @@ User.customFindById = (id, result) => {
 		}
 	});
 };
+//	END DB FOR PROFILE ROUTES
 
+
+User.validatedEmail = (user, result) => {
+	const contents = [
+		tableName,
+		{ email: user.email }
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			result(null, res);
+		} else {
+			result(err, null);
+		}
+	});
+};
 User.customFindAll = (result) => {
 	const contents = [
 		[

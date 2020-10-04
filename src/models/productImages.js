@@ -11,6 +11,8 @@ const Images = function (images) {
 	this.picture = images.picture;
 };
 
+const queryFindImagePrimary = 'SELECT * FROM product_images WHERE ?? IN ? AND isPrimary>0';
+
 Images.create = (images, result) => {
 	const contents = [
 		tableName,
@@ -69,12 +71,12 @@ Images.findById = (id, result) => {
 	});
 };
 
-Images.findAll = (id, result) => {
+Images.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -107,6 +109,47 @@ Images.delete = (id, result) => {
 
 
 //Custom
+//	START DB HOME ROUTES
+Images.findImageByPrimary = (id, result) => {
+	const contents = [
+		'product_id',
+		[id]
+	];
+
+	db.query(queryFindImagePrimary, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+// END DB HOME ROUTES
+
+//	START DB PRODUCT DETAILS ROUTE
+Images.findByProductId = (id, result) => {
+	const contents = [
+		tableName,
+		{'product_id': id}
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+//	END DB PRODUCT DETAILS ROUTE
 
 Images.createByProductId = (images, result) => {
 	const contentsValidate = [
@@ -131,35 +174,6 @@ Images.createByProductId = (images, result) => {
 			});
 		} else {
 			result('Product is not found', null);
-		}
-	});
-};
-
-Images.findByProductId = (id, result) => {
-	const contents = [
-		[
-			'product_images.id',
-			'product_images.picture',
-			'products.name',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
-		],
-		tableName,
-		tableJoin,
-		'product_images.product_id',
-		'products.id',
-		{'products.id': id}
-	];
-
-	db.query(query.findJoinTable, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
 		}
 	});
 };

@@ -11,11 +11,19 @@ const Products = function (products) {
 	this.name = products.name;
 	this.price = products.price;
 	this.stock = products.stock;
-	this.maxSize = products.maxSize;
 	this.created_at = products.created_at;
 	this.updated_at = products.updated_at;
 	this.description = products.description;
 };
+
+const queryFindBySearch = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
+'AS rating FROM products, product_ratings WHERE ?? LIKE ? GROUP BY products.id';
+const queryFindByCondition = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' +
+'AS rating FROM products, product_ratings WHERE ? GROUP BY products.id';
+const querySortByCreatedAt = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
+'AS rating FROM products, product_ratings GROUP BY products.id ORDER BY created_at ASC';
+const querySortByRatings = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
+'AS rating FROM products, product_ratings GROUP BY products.id ORDER BY rating DESC';
 
 Products.create = (products, result) => {
 	const contents = [
@@ -75,12 +83,12 @@ Products.findById = (id, result) => {
 	});
 };
 
-Products.findAll = (id, result) => {
+Products.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -112,8 +120,93 @@ Products.delete = (id, result) => {
 };
 
 //Custom
+//	START DB FOR HOME ROUTES
+Products.findBySearch = (searchKey, searchValue, result) => {
+	const contents = [
+		searchKey,
+		'%'+searchValue+'%',
+	];
 
-Products.createByValidated = (products, result) => {
+	db.query(queryFindBySearch, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.findByCategoryId = (id, result) => {
+	const contents = [
+		{'products.category_id': id}
+	];
+
+	db.query(queryFindByCondition, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.findByCreatedAt = (result) => {
+	db.query(querySortByCreatedAt, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.findByRatings = (result) => {
+	db.query(querySortByRatings, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+//	END DB FOR HOME ROUTES
+
+//	START DB FOR PROFILE SALLER ROUTES
+Products.findByUserId = (id, result) => {
+	const contents = [
+		{'products.user_id': id}
+	];
+
+	db.query(queryFindByCondition, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+
+Products.createByUserId = (products, result) => {
 	const contentsValidate = [
 		tableJoin[0],
 		{ id: products.category_id }
@@ -129,7 +222,7 @@ Products.createByValidated = (products, result) => {
 		if (res.length) {
 			db.query(query.insert, contents, (err) => {
 				if (!err) {
-					result(null, { ...products });
+					result(null, {});
 				} else {
 					result(err, null);
 				}
@@ -141,9 +234,34 @@ Products.createByValidated = (products, result) => {
 
 };
 
+Products.updateByUserId = (products, id, result) => {
+	const contents = [
+		tableName,
+		{
+			...products
+		},
+		{ id: id, user_id: products.user_id },
+	];
+
+	db.query(query.updateSecondCondition, contents, (err, res) => {
+		if (!err) {
+			if (res.affectedRows != 0) {
+				result(null, {});
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+//	END DB FOR PROFILE SALLER ROUTES
+
+
 Products.customFindById = (id, result) => {
 	const contents = [
 		[
+			'products.id',
 			'products.user_id',
 			'products.category_id',
 			'products.conditions_id',
@@ -152,11 +270,7 @@ Products.customFindById = (id, result) => {
 			'products.stock',
 			'products.maxSize',
 			'products.description',
-			'user.name AS nameUser',
-			'category.name AS nameCategory',
-			'conditions.status AS condition',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
+			'conditions.status',
 		],
 		tableName,
 		tableJoin[2],
@@ -184,38 +298,17 @@ Products.customFindById = (id, result) => {
 	});
 };
 
-Products.findByUserId = (id, result) => {
+Products.findByPopulerProducts = (offset, limit, searchKey, searchValue, sortBy, sort, id, result) => {
 	const contents = [
-		[
-			'products.id',
-			'products.user_id',
-			'products.category_id',
-			'products.conditions_id',
-			'products.name',
-			'products.price',
-			'products.stock',
-			'products.maxSize',
-			'products.description',
-			'user.name AS nameUser',
-			'category.name AS nameCategory',
-			'conditions.status AS condition',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
-		],
-		tableName,
-		tableJoin[2],
-		'products.user_id',
-		'user.id',
-		tableJoin[0],
-		'products.category_id',
-		'category.id',
-		tableJoin[1],
-		'products.conditions_id',
-		'conditions.id',
-		{'user.id': id}
+		searchKey,
+		'%'+searchValue+'%',
+		'products.'+sortBy,
+		// sort,
+		limit,
+		offset
 	];
 
-	db.query(query.findJoinThirdTable, contents, (err, res) => {
+	db.query(query.findPopuler, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -228,9 +321,10 @@ Products.findByUserId = (id, result) => {
 	});
 };
 
-Products.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
+Products.customFindAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
 	const contents = [
 		[
+			'products.id',
 			'products.user_id',
 			'products.category_id',
 			'products.conditions_id',
@@ -239,11 +333,7 @@ Products.findAll = (offset, limit, searchKey, searchValue, sortBy, sort, result)
 			'products.stock',
 			'products.maxSize',
 			'products.description',
-			'user.name AS nameUser',
-			'category.name AS nameCategory',
-			'conditions.status AS condition',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
+			'conditions.status',
 		],
 		tableName,
 		tableJoin[2],

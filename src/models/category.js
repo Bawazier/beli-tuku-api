@@ -66,12 +66,12 @@ Category.findById = (id, result) => {
 	});
 };
 
-Category.findAll = (id, result) => {
+Category.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);

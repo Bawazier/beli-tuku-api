@@ -7,8 +7,8 @@ router.patch('/profile/account', profile.updateAccountById);
 router.put('/profile/account', profile.updateAccountAllById);
 
 router.get('/products', products.findProductByUserId);
-router.post('/products', products.createProductByUserId);
-router.patch('/products', products.updateProductByUserId);
-router.put('/products', products.updateProductAllByUserId);
+// router.post('/products', products.createProductByUserId);
+// router.patch('/products', products.updateProductByUserId);
+// router.put('/products', products.updateProductAllByUserId);
 
 module.exports = router;

@@ -12,7 +12,7 @@ const Address = function (address) {
 	this.address = address.address;
 	this.region = address.region;
 	this.postal_code = address.postal_code;
-	this.primary = address.primary;
+	this.isPrimary = address.isPrimary;
 };
 
 Address.create = (address, result) => {
@@ -73,7 +73,7 @@ Address.findById = (id, result) => {
 	});
 };
 
-Address.findAll = (id, result) => {
+Address.findAll = (result) => {
 	const contents = [
 		tableName
 	];
@@ -110,6 +110,25 @@ Address.delete = (id, result) => {
 };
 
 //Custom
+//	START DB FOR CUSTOMER ADDRESS ROUTES
+Address.findByUserId = (id, result) => {
+	const contents = [
+		tableName,
+		{ user_id: id }
+	];
+
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
 Address.createByUserId = (address, result) => {
 	const contentsValidate = [
 		tableJoin,
@@ -126,7 +145,7 @@ Address.createByUserId = (address, result) => {
 		if (res.length) {
 			db.query(query.insert, contents, (err) => {
 				if (!err) {
-					result(null, { ...address });
+					result(null, {});
 				} else {
 					result(err, null);
 				}
@@ -136,7 +155,6 @@ Address.createByUserId = (address, result) => {
 		}
 	});
 };
-
 Address.updateByUserId = (address, id, result) => {
 	const contents = [
 		tableName,
@@ -150,7 +168,7 @@ Address.updateByUserId = (address, id, result) => {
 	db.query(query.updateSecondCondition, contents, (err, res) => {
 		if (!err) {
 			if (res.affectedRows != 0) {
-				result(null, address);
+				result(null, {});
 			} else {
 				result({ kind: 'not_found' }, null);
 			}
@@ -159,35 +177,40 @@ Address.updateByUserId = (address, id, result) => {
 		}
 	});
 };
-
-Address.findByUserId = (id, result) => {
-	const contents = [
-		[
-			'id',
-			'user_id',
-			'name',
-			'recipient_name',
-			'recipient_tlp',
-			'address',
-			'region',
-			'postal_code',
-		],
+Address.updatePrimary = (address, id, result) => {
+	const contentsValidate = [
 		tableName,
-		{ user_id: id }
+		{
+			isPrimary: '0'
+		},
+		{ user_id: address.user_id }
 	];
-
-	db.query(query.customFindById, contents, (err, res) => {
+	const contents = [
+		tableName,
+		{
+			isPrimary: address.isPrimary
+		},
+		{ id: id }
+	];
+	db.query(query.update, contentsValidate, (err) => {
 		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
+			db.query(query.update, contents, (err, res) => {
+				if (!err) {
+					if (res.affectedRows != 0) {
+						result(null, {});
+					} else {
+						result({ kind: 'not_found' }, null);
+					}
+				} else {
+					result(err, null);
+				}
+			});
 		} else {
 			result(err, null);
 		}
 	});
 };
+//	END DB FOR CUSTOMER ADDRESS ROUTES
 
 Address.deleteByUserId = (id, result) => {
 	const contents = [

@@ -17,10 +17,10 @@ const options = multer({
 	// },
 	fileFilter: (req, file, cb) => {
 		if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-			cb(new Error('Only image are allowed.'), false);
+			cb('Only image are allowed.', false);
 		}
 		if(file.size > (500 * 1024)){
-			cb(new Error('Size image not allowed.'), false);
+			cb('Size image not allowed.', false);
 		}
 		cb(null, true);
 	}

@@ -56,7 +56,7 @@ const Cart = joi.object({
 	quantity: joi.number().integer().positive(),
 	totalPrice: joi.number().integer().positive(),
 	isCheck: joi.string().valid('true', 'false').lowercase(),
-	status: joi.string().valid('in', 'out').lowercase()
+	status: joi.string().valid('in', 'out').uppercase()
 });
 
 const product_ratings = joi.object({
@@ -91,7 +91,7 @@ const Roles = joi.object({
 });
 
 const picture = joi.object().keys({
-	a: joi.string().pattern(/\.(jpg|jpeg|png)$/)
+	a : joi.string().pattern(/\.(jpg|jpeg|png)$/)
 });
 
 module.exports = {

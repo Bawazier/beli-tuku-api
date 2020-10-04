@@ -65,7 +65,7 @@ Conditions.findById = (id, result) => {
 	});
 };
 
-Conditions.findAll = (id, result) => {
+Conditions.findAll = (result) => {
 	const contents = [
 		tableName
 	];

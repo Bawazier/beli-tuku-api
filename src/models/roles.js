@@ -65,7 +65,7 @@ Roles.findById = (id, result) => {
 	});
 };
 
-Roles.findAll = (id, result) => {
+Roles.findAll = (result) => {
 	const contents = [
 		tableName
 	];

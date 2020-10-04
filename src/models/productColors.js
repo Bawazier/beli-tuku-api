@@ -68,12 +68,12 @@ Colors.findById = (id, result) => {
 	});
 };
 
-Colors.findAll = (id, result) => {
+Colors.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -105,7 +105,26 @@ Colors.delete = (id, result) => {
 };
 
 //Custom
+//	START DB FOR PRODUCT DETAILS ROUTES
+Colors.findByProductId = (id, result) => {
+	const contents = [
+		tableName,
+		{'product_id': id}
+	];
 
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+//	START DB FOR PRODUCT DETAILS ROUTES
 Colors.createByProductId = (colors, result) => {
 	const contentsValidate = [
 		tableJoin,
@@ -129,35 +148,6 @@ Colors.createByProductId = (colors, result) => {
 			});
 		} else {
 			result('Product is not found', null);
-		}
-	});
-};
-
-Colors.findByProductId = (id, result) => {
-	const contents = [
-		[
-			'product_colors.id',
-			'product_colors.color',
-			'product_colors.status',
-			'product_colors.product_id',
-			'products.name',
-		],
-		tableName,
-		tableJoin,
-		'product_colors.product_id',
-		'products.id',
-		{'products.id': id}
-	];
-
-	db.query(query.findJoinTable, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
 		}
 	});
 };

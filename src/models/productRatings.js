@@ -70,12 +70,12 @@ Ratings.findById = (id, result) => {
 	});
 };
 
-Ratings.findAll = (id, result) => {
+Ratings.findAll = (result) => {
 	const contents = [
 		tableName
 	];
 
-	db.query(query.findById, contents, (err, res) => {
+	db.query(query.findAll, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -107,7 +107,26 @@ Ratings.delete = (id, result) => {
 };
 
 //Custom
+// START DB FOR PRODUCT DETAILS ROUTES
+Ratings.findByProductId = (id, result) => {
+	const contents = [
+		tableName,
+		{'product_id': id}
+	];
 
+	db.query(query.findById, contents, (err, res) => {
+		if (!err) {
+			if (res.length) {
+				result(null, res);
+			} else {
+				result({ kind: 'not_found' }, null);
+			}
+		} else {
+			result(err, null);
+		}
+	});
+};
+// END DB FOR PRODUCT DETAILS ROUTES
 Ratings.createByProductId = (ratings, result) => {
 	const contentsValidate = [
 		tableJoin[0],
@@ -140,24 +159,19 @@ Ratings.findByUserId = (id, result) => {
 		[
 			'product_ratings.id',
 			'product_ratings.rating',
-			'product_ratings.product_id',
-			'products.name',
 			'product_ratings.user_id',
 			'user.name',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
+			'product_ratings.created_at',
+			'product_ratings.updated_at',
 		],
 		tableName,
-		tableJoin[0],
-		'product_ratings.product_id',
-		'products.id',
 		tableJoin[1],
 		'product_ratings.user_id',
 		'user.id',
-		{'user.id': id}
+		{'product_ratings.user_id': id}
 	];
 
-	db.query(query.findJoinSecondTable, contents, (err, res) => {
+	db.query(query.findJoinTable, contents, (err, res) => {
 		if (!err) {
 			if (res.length) {
 				result(null, res);
@@ -170,40 +184,7 @@ Ratings.findByUserId = (id, result) => {
 	});
 };
 
-Ratings.findByProductId = (id, result) => {
-	const contents = [
-		[
-			'product_ratings.id',
-			'product_ratings.rating',
-			'product_ratings.product_id',
-			'products.name',
-			'product_ratings.user_id',
-			'user.name',
-			'DATE_FORMAT(created_at, "%d %M %Y")',
-			'DATE_FORMAT(updated_at, "%d %M %Y")',
-		],
-		tableName,
-		tableJoin[0],
-		'product_ratings.product_id',
-		'products.id',
-		tableJoin[1],
-		'product_ratings.user_id',
-		'user.id',
-		{'products.id': id}
-	];
 
-	db.query(query.findJoinSecondTable, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
 
 Ratings.deleteByUserId = (id, result) => {
 	const contents = [
