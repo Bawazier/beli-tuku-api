@@ -1,9 +1,15 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 
+app.use(
+	cors({
+		origin: 'http://localhost:3000',
+	})
+);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.listen(process.env.PORT, () => {
 	console.log('Listening on http://localhost:5000/');
