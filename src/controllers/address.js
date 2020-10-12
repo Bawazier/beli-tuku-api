@@ -30,7 +30,8 @@ module.exports = {
 				recipient_tlp: result.recipient_tlp,
 				address: result.address,
 				region: result.region,
-				postal_code: result.postal_code
+				postal_code: result.postal_code,
+				isPrimary: 0
 			};
 
 			Address.create(address, (err, respone) => {
@@ -55,7 +56,8 @@ module.exports = {
 				recipient_tlp: result.recipient_tlp,
 				address: result.address,
 				region: result.region,
-				postal_code: result.postal_code
+				postal_code: result.postal_code,
+				isPrimary: 0
 			};
 			let filteredObject = Object.keys(address).reduce((result, key) => {
 				if (address[key] !== undefined) result[key] = address[key];
@@ -88,7 +90,8 @@ module.exports = {
 				recipient_tlp: result.recipient_tlp,
 				address: result.address,
 				region: result.region,
-				postal_code: result.postal_code
+				postal_code: result.postal_code,
+				isPrimary: 0
 			};
 
 			Address.updateByUserId(address, req.params.id, (err, respone) => {

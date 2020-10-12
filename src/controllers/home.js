@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Category = require('../models/category');
 const Images = require('../models/productImages');
 const responeStandart = require('../helper/respone');
 
@@ -38,7 +39,23 @@ module.exports = {
 
 	},
 
-	// findCategory: (req, res) => {},
+	findCategory: (req, res) => {
+		Category.findAll((err, respone) => {
+			if (!err) {
+				const data = respone.map((item) => {
+					const picture = { URL_image: process.env.URL + item.picture };
+					return Object.assign({}, item, picture);
+				});
+				return responeStandart(res, 'get category', { data });
+			} else {
+				if (err.kind === 'not_found') {
+					return responeStandart(res, 'not found category', {}, 404, false);
+				} else {
+					return responeStandart(res, err.sqlMessage, {}, 500, false);
+				}
+			}
+		});
+	},
 	
 	findProductByCategoryId: (req, res) => {
 		Product.findByCategoryId(req.params.id, (err, respone) => {

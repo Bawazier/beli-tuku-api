@@ -8,6 +8,7 @@ const Ratings = function (ratings) {
 	this.product_id = ratings.product_id;
 	this.user_id = ratings.user_id;
 	this.rating = ratings.rating;
+	this.comment = ratings.comment;
 	this.created_at = ratings.created_at;
 	this.updated_at = ratings.updated_at;
 };
@@ -154,20 +155,23 @@ Ratings.createByProductId = (ratings, result) => {
 	});
 };
 
+//	START DB FOR CUSTOMER RATINGS ROUTES
 Ratings.findByUserId = (id, result) => {
 	const contents = [
 		[
 			'product_ratings.id',
-			'product_ratings.rating',
 			'product_ratings.user_id',
-			'user.name',
+			'product_ratings.product_id',
+			'products.name',
+			'product_ratings.rating',
+			'product_ratings.comment',
 			'product_ratings.created_at',
 			'product_ratings.updated_at',
 		],
 		tableName,
-		tableJoin[1],
-		'product_ratings.user_id',
-		'user.id',
+		tableJoin[0],
+		'product_ratings.product_id',
+		'products.id',
 		{'product_ratings.user_id': id}
 	];
 
@@ -183,6 +187,36 @@ Ratings.findByUserId = (id, result) => {
 		}
 	});
 };
+Ratings.createByProductId = (ratings, id, result) => {
+	const contentsValidate = [
+		tableJoin[0],
+		{ id: id }
+	];
+	const contents = [
+		tableName,
+		{
+			...ratings
+		}
+	];
+
+	db.query(query.findById, contentsValidate, (err, res) => {
+		if (!err && res.length) {
+			db.query(query.insert, contents, (err) => {
+				if (!err) {
+					result(null, {});
+				} else {
+					result(err, null);
+				}
+			});
+		} else {
+			console.log(err);
+			result('Product is not found', null);
+		}
+	});
+};
+//	END DB FOR CUSTOMER RATINGS ROUTES
+
+
 
 
 
