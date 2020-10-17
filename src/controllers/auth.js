@@ -24,7 +24,7 @@ module.exports = {
 						if (comparePass) {
 							jwt.sign({ id: user[0].id, roles_id: user[0].roles_id }, process.env.PRIVATE_CODE, function (err, token) {
 								if (!err) {
-									return responeStandart(res, token, {});
+									return responeStandart(res, 'Loggin Success', { token: token, auth: { id: user[0].id, roles_id: user[0].roles_id }});
 								} else {
 									return responeStandart(res, err, {}, 403, false);
 								}
