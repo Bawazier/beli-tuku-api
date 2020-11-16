@@ -1,100 +1,140 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('../models/user');
-const schema = require('../helper/inputValidated');
-const responeStandart = require('../helper/respone');
+/* eslint-disable no-mixed-spaces-and-tabs */
+const { User } = require("../models");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const schema = require("../helper/validation");
+const responseStandart = require("../helper/response");
 
-const loginSchema = schema.auth[0];
-const registerCustomerSchema = schema.auth[1];
-const registerSallerSchema = schema.auth[2];
+const signupSignupCustomer = schema.SignupCustomer;
+const loginSchema = schema.Login;
+const changePassSchema = schema.ChangePass;
+const forgotPassSchema = schema.ForgotPass;
 
 module.exports = {
-	login: async (req, res) => {
-		try {
-			const result = await loginSchema.required().validateAsync(req.body);
-			const user = {
-				email: result.email,
-				roles_id: await result.roles_id === 'customer' ? 3: result.roles_id === 'saller' ? 2:false
-			};
+  login: async (req, res) => {
+    try {
+      const result = await loginSchema.required().validateAsync(req.body);
+      const user = {
+        email: result.email,
+      };
 
-			User.login(user, async (err, user) => {
-				try {
-					if (!err && user.length) {
-						const comparePass = await bcrypt.compareSync(result.password, user[0].password);
-						if (comparePass) {
-							jwt.sign({ id: user[0].id, roles_id: user[0].roles_id }, process.env.PRIVATE_CODE, function (err, token) {
-								if (!err) {
-									return responeStandart(res, 'Loggin Success', { token: token, auth: { id: user[0].id, roles_id: user[0].roles_id }});
-								} else {
-									return responeStandart(res, err, {}, 403, false);
-								}
-							});
-						} else {
-							return responeStandart(res, 'Wrong Password', {}, 400, false);
-						}
-					} else {
-						return responeStandart(res, 'Wrong Email', {}, 500, false);
-					}
-				} catch (e) {
-					return responeStandart(res, e.details[0].message, {}, 400, false);
-				}
-			});
-		} catch (e) {
-			console.log(e);
-			return responeStandart(res, e.details[0].message, {}, 400, false);
-		}
+      const validate = await User.findAll({
+        where: {
+          email: user.email,
+        },
+      });
+      const comparePass = await bcrypt.compareSync(
+        result.password,
+        validate[0].password
+      );
+      if (validate && comparePass) {
+        jwt.sign(
+          { id: validate[0].id },
+          process.env.APP_KEY,
+          { expiresIn: "2 days" },
+          function (err, token) {
+            if (!err) {
+              return responseStandart(res, "Loggin Success", {
+                token: token,
+                auth: { id: validate[0].id },
+              });
+            } else {
+              return responseStandart(res, err, {}, 403, false);
+            }
+          }
+        );
+      } else {
+        return responseStandart(res, "Wrong Password", {}, 400, false);
+      }
+    } catch (e) {
+      return responseStandart(res, e.details[0].message, {}, 400, false);
+    }
+  },
 
-	},
+  signup: async (req, res) => {
+    try {
+	  const result = await signupSignupCustomer
+        .required()
+        .validateAsync(req.body);
+      const saltRounds = 10;
+      const salt = await bcrypt.genSaltSync(saltRounds);
+      const hash = await bcrypt.hashSync(result.password, salt);
+      const user = {
+        name: result.name,
+        email: result.email,
+        password: hash,
+        rolesId: 3
+      };
 
+      const validate = User.findAll({
+        where: {
+          email: user.email,
+        },
+	  });
+      if (!validate.length) {
+        await User.create(user);
+        console.log(validate);
+        return responseStandart(res, "Signup Success", {});
+      } else {
+        return responseStandart(res, "Email already used", {}, 400, false);
+      }
+    } catch (e) {
+      return responseStandart(res, e.details[0].message, {}, 400, false);
+    }
+  },
 
-	registerCustomer: async (req, res) => {
-		try {
-			const result = await registerCustomerSchema.required().validateAsync(req.body);
-			const saltRounds = 10;
-			const salt = await bcrypt.genSaltSync(saltRounds);
-			const hash = await bcrypt.hashSync(result.password, salt);
-			const user = {
-				roles_id: 3,
-				name: result.name,
-				email: result.email,
-				password: hash,
-			};
+  changePass: async (req, res) => {
+    try {
+      const result = await changePassSchema.required().validateAsync(req.body);
+      if (result.newPassword === result.confirmNewPassword) {
+        const saltRounds = 10;
+        const salt = await bcrypt.genSaltSync(saltRounds);
+        const hash = await bcrypt.hashSync(result.newPassword, salt);
 
-			User.createByValidated(user, (err, data) => {
-				if (!err) {
-					return responeStandart(res, 'Register Customer Success', { data });
-				} else {
-					return responeStandart(res, err, {}, 500, false);
-				}
-			});
-		} catch (e) {
-			return responeStandart(res, e.details[0].message, {}, 400, false);
-		}
-	},
+        const user = {
+          password: hash,
+        };
+        await User.update(user, {
+          where: {
+            id: req.params.id,
+          },
+        });
+        return responseStandart(res, "Change Password Success", {});
+      } else {
+        return responseStandart(
+          res,
+          "Passwords are not the same",
+          {},
+          400,
+          false
+        );
+      }
+    } catch (e) {
+      return responseStandart(res, e.details[0].message, {}, 400, false);
+    }
+  },
 
-	registerSaller: async (req, res) => {
-		try {
-			const result = await registerSallerSchema.required().validateAsync(req.body);
-			const saltRounds = 10;
-			const salt = await bcrypt.genSaltSync(saltRounds);
-			const hash = await bcrypt.hashSync(result.password, salt);
-			const user = {
-				roles_id: 2,
-				name: result.name,
-				email: result.email,
-				phone: result.phone,
-				password: hash,
-			};
-
-			User.createByValidated(user, (err, data) => {
-				if (!err) {
-					return responeStandart(res, 'Register Saller Success', { data });
-				} else {
-					return responeStandart(res, err, {}, 500, false);
-				}
-			});
-		} catch (e) {
-			return responeStandart(res, e.details[0].message, {}, 400, false);
-		}
-	},
+  forgotPass: async (req, res) => {
+    try {
+      const result = await forgotPassSchema.required().validateAsync(req.body);
+      const validate = await User.findAll({
+        where: {
+          email: result.email,
+        },
+      });
+      if (validate.length) {
+        return responseStandart(res, "Email Valid", { validate });
+      } else {
+        return responseStandart(
+          res,
+          "The user is not registered yet",
+          {},
+          400,
+          false
+        );
+      }
+    } catch (e) {
+      return responseStandart(res, e.details[0].message, {}, 400, false);
+    }
+  },
 };
