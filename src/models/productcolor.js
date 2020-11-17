@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 const {
   Model
-} = require('sequelize');
+} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ProductColor extends Model {
     /**
@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "productId",
       });
     }
-  };
+  }
+  
   ProductColor.init({
     productId: DataTypes.INTEGER,
     name: DataTypes.STRING,
@@ -23,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'ProductColor',
+    modelName: "ProductColor",
   });
   return ProductColor;
 };

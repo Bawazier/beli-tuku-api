@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 const {
   Model
-} = require('sequelize');
+} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ProductImage extends Model {
     /**
@@ -15,14 +15,15 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "productId",
       });
     }
-  };
+  }
+  
   ProductImage.init({
     productId: DataTypes.INTEGER,
     picture: DataTypes.TEXT,
     isPrimary: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'ProductImage',
+    modelName: "ProductImage",
   });
   return ProductImage;
 };

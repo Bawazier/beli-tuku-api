@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 const {
   Model
-} = require('sequelize');
+} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class UserAddress extends Model {
     /**
@@ -11,8 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      UserAddress.belongsTo(models.User, {
+        foreignKey: "userId"
+      });
     }
-  };
+  }
+  
   UserAddress.init({
     userId: DataTypes.INTEGER,
     name: DataTypes.STRING,
@@ -24,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     isPrimary: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'UserAddress',
+    modelName: "UserAddress",
   });
   return UserAddress;
 };

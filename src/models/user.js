@@ -14,12 +14,21 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.Roles, {
         foreignKey: "rolesId"
       });
-      User.hasMany(models.Product);
-      User.hasMany(models.ProductRating);
-      User.hasMany(models.UserAddress);
-      User.hasMany(models.Cart);
+      User.hasMany(models.Product, {
+        foreignKey: "userId"
+      });
+      User.hasMany(models.ProductRating, {
+        foreignKey: "userId",
+      });
+      User.hasMany(models.UserAddress, {
+        foreignKey: "userId",
+      });
+      User.hasMany(models.Cart, {
+        foreignKey: "userId",
+      });
     }
-  };
+  }
+  
   User.init({
     rolesId: DataTypes.INTEGER,
     name: DataTypes.STRING,

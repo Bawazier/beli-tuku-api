@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 const {
   Model
-} = require('sequelize');
+} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ProductRating extends Model {
     /**
@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId"
       });
     }
-  };
+  }
+  
   ProductRating.init({
     productId: DataTypes.INTEGER,
     userId: DataTypes.INTEGER,
@@ -26,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     comment: DataTypes.TEXT
   }, {
     sequelize,
-    modelName: 'ProductRating',
+    modelName: "ProductRating",
   });
   return ProductRating;
 };
