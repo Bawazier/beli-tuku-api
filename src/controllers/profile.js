@@ -1,104 +1,114 @@
-const User = require('../models/user');
-const responeStandart = require('../helper/respone');
-const schema = require('../helper/inputValidated');
+const { User } = require("../models");
+const responseStandart = require("../helper/response");
+const schema = require("../helper/validation");
 
-const multer = require('multer');
-const options = require('../helper/upload');
-const upload = options.single('picture');
+const multer = require("multer");
+const options = require("../helper/upload");
+const upload = options.single("picture");
 
-const accountSchema = schema.profileCustomer[0];
-
+const userSchema = schema.User;
 
 module.exports = {
-	findAccountById: (req, res) => {
-		User.findByUserId(req.user.id, (err, respone) => {
-			if(!err){
-				const data = respone.map(item => {
-					const picture = {URL_image: process.env.URL + item.picture};
-					return Object.assign({}, item, picture);
-				});
-				return responeStandart(res, 'get info account success', {data});
-			}else{
-				if (err.kind === 'not_found') {
-					return responeStandart(res, 'not found account', {}, 404, false);
-				} else {
-					return responeStandart(res, err.sqlMessage, {}, 500, false);
-				}
-			}
-		});
-	},
+  getUser: async (req, res) => {
+    try {
+      const data = await User.findAll({
+        where: {
+          id: req.user.id,
+        },
+      });
+      const results = data.map((item) => {
+        const picture = { URL_picture: process.env.APP_URL + item.picture };
+        return Object.assign({}, item.dataValues, picture);
+      });
+      return responseStandart(res, "success display user data", {
+        results,
+      });
+    } catch (e) {
+      return responseStandart(
+        res,
+        "cannot display user data",
+        { ValidationError: e.details[0].message, sqlError: e },
+        400,
+        false
+      );
+    }
+  },
 
-	updateAccountById: (req, res) => {
-		upload(req, res, async (err) => {
-			if (err instanceof multer.MulterError) {
-				return responeStandart(res, err, {}, 500, false);
-			} else if (err) {
-				return responeStandart(res, err, {}, 500, false);
-			}
-			try {
-				const result = await accountSchema.validateAsync(req.body);
-				const user = {
-					name: result.name,
-					email: result.email,
-					phone: result.phone,
-					gender: result.gender,
-					dateOfBirth: result.dateOfBirth,
-					picture: req.file === undefined ? undefined:req.file.path
-				};
-				let filteredObject = Object.keys(user).reduce((result, key) => {
-					if (user[key] !== undefined) result[key] = user[key];
-					return result;
-				}, {});
-				User.updateByUserId(filteredObject, req.user.id, (err, respone) => {
-					if (!err) {
-						return responeStandart(res, 'Update Account Success', { respone });
-					} else {
-						if (err.kind === 'not_found') {
-							return responeStandart(res, 'not found account', {}, 404, false);
-						} else {
-							return responeStandart(res, err.sqlMessage, {}, 500, false);
-						}
-					}
-				});
-			} catch (e) {
-				return responeStandart(res, e.details[0].message, {}, 400, false);
-			}
-		});
-	},
-    
-	updateAccountAllById: async (req, res) => {
-		upload(req, res, async (err) => {
-			if (err instanceof multer.MulterError) {
-				return responeStandart(res, err, {}, 500, false);
-			} else if (err) {
-				return responeStandart(res, err, {}, 500, false);
-			}
-			try {
-				const result = await accountSchema.required().validateAsync(req.body);
-				const user = {
-					name: result.name,
-					email: result.email,
-					phone: result.phone,
-					gender: result.gender,
-					dateOfBirth: result.dateOfBirth,
-					picture: req.file === undefined ? undefined:req.file.path
-				};
-				User.updateByUserId(user, req.user.id, (err, respone) => {
-					if (!err) {
-						return responeStandart(res, 'Update Account Success', { respone });
-					} else {
-						if (err.kind === 'not_found') {
-							return responeStandart(res, 'not found account', {}, 404, false);
-						} else if (err.kind === 'Email Already Used') {
-							return responeStandart(res, 'Email Already Used', {}, 404, false);
-						}else{
-							return responeStandart(res, err.sqlMessage, {}, 500, false);
-						}
-					}
-				});
-			} catch (e) {
-				return responeStandart(res, e.details[0].message, {}, 400, false);
-			}
-		});
-	},
+  patchUser: async (req, res) => {
+    upload(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return responseStandart(res, err, {}, 500, false);
+      } else if (err) {
+        return responseStandart(res, err, {}, 500, false);
+      }
+      try {
+        const result = await userSchema.validateAsync(req.body);
+        const user = {
+          name: result.name,
+          email: result.email,
+          phone: result.phone,
+          gender: result.gender,
+          dateOfBirth: result.dateOfBirth,
+          picture: req.file === undefined ? undefined : req.file.path,
+        };
+        const filteredObject = Object.keys(user).reduce((results, key) => {
+          if (user[key] !== undefined) results[key] = user[key];
+          return results;
+        }, {});
+        await User.update(filteredObject, {
+          where: {
+            id: req.user.id,
+          },
+        });
+        return responseStandart(res, "success update user data", {});
+      } catch (e) {
+        return responseStandart(
+          res,
+          "cannot display user data",
+          { ValidationError: e.details[0].message, sqlError: e },
+          400,
+          false
+        );
+      }
+    });
+  },
+
+  putUser: async (req, res) => {
+    upload(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return responseStandart(res, err, {}, 500, false);
+      } else if (err) {
+        return responseStandart(res, err, {}, 500, false);
+      }
+      try {
+        const result = await userSchema.required().validateAsync(req.body);
+        const user = {
+          name: result.name,
+          email: result.email,
+          phone: result.phone,
+          gender: result.gender,
+          dateOfBirth: result.dateOfBirth,
+          picture: req.file === undefined ? undefined : req.file.path,
+        };
+        const filteredObject = Object.keys(user).reduce((results, key) => {
+          if (user[key] !== undefined) results[key] = user[key];
+          return results;
+        }, {});
+        await User.update(filteredObject, {
+          where: {
+            id: req.user.id,
+          },
+        });
+        return responseStandart(res, "success update user data", {});
+      } catch (e) {
+        return responseStandart(
+          res,
+          "cannot display user data",
+          { ValidationError: e.details[0].message, sqlError: e },
+          400,
+          false
+        );
+      }
+    });
+  },
 };
