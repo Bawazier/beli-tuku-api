@@ -23,28 +23,32 @@ module.exports = {
           email: user.email,
         },
       });
-      const comparePass = await bcrypt.compareSync(
-        result.password,
-        validate[0].password
-      );
-      if (validate && comparePass) {
-        jwt.sign(
-          { id: validate[0].id, rolesId: validate[0].rolesId },
-          process.env.APP_KEY,
-          { expiresIn: "2 days" },
-          function (err, token) {
-            if (!err) {
-              return responseStandart(res, "Loggin Success", {
-                token: token,
-                auth: { id: validate[0].id },
-              });
-            } else {
-              return responseStandart(res, err, {}, 403, false);
-            }
-          }
+      if(validate.length){
+        const comparePass = await bcrypt.compareSync(
+          result.password,
+          validate[0].password
         );
-      } else {
-        return responseStandart(res, "Wrong Password", {}, 400, false);
+        if (comparePass) {
+          jwt.sign(
+            { id: validate[0].id, rolesId: validate[0].rolesId },
+            process.env.APP_KEY,
+            { expiresIn: "2 days" },
+            function (err, token) {
+              if (!err) {
+                return responseStandart(res, "Loggin Success", {
+                  token: token,
+                  auth: { id: validate[0].id },
+                });
+              } else {
+                return responseStandart(res, err, {}, 403, false);
+              }
+            }
+          );
+        } else {
+          return responseStandart(res, "Wrong Password", {}, 400, false);
+        }
+      }else{
+        return responseStandart(res, "Wrong email", {}, 400, false);
       }
     } catch (e) {
       return responseStandart(res, e.details[0].message, {}, 400, false);
@@ -118,6 +122,16 @@ module.exports = {
     try {
       const result = await forgotPassSchema.required().validateAsync(req.body);
       const validate = await User.findAll({
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "gender",
+          "dateOfBirth",
+          "picture",
+          "createdAt",
+        ],
         where: {
           email: result.email,
         },
