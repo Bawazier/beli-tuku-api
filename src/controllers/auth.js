@@ -29,7 +29,7 @@ module.exports = {
       );
       if (validate && comparePass) {
         jwt.sign(
-          { id: validate[0].id },
+          { id: validate[0].id, rolesId: validate[0].rolesId },
           process.env.APP_KEY,
           { expiresIn: "2 days" },
           function (err, token) {
