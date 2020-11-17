@@ -22,7 +22,7 @@ app.listen(APP_PORT, () => {
   console.log(`app listen on port ${APP_PORT}`);
 });
 
-provide static file
+// provide static file
 app.use("/assets/uploads/", express.static("assets/uploads"));
 
 const homeRouter = require("./src/routes/home");
