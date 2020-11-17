@@ -1,26 +1,89 @@
-const Product = require('../models/product');
-const responeStandart = require('../helper/respone');
+const {Product, ProductColor, ProductImage, ProductRating} = require("../models");
+const responseStandart = require("../helper/response");
+const multer = require("multer");
+const schema = require("../helper/validation");
+const options = require("../helper/upload");
 
+const upload = options.array("picture", 4);
+const ProductSchema = schema.Products;
+const RatingsSchema = schema.Ratings;
 
 
 module.exports = {
-	findProductByUserId: (req, res) => {
-		Product.findProductByUserId(req.user.id, (err, data) => {
-			if (!err) {
-				return responeStandart(res, 'get info product user success', { data });
-			} else {
-				if (err.kind === 'not_found') {
-					return responeStandart(res, 'Not found Product', {}, 404, false);
-				} else {
-					return responeStandart(res, err.sqlMessage, {}, 500, false);
-				}
-			}
-		});
-	},
+  postProduct: async (req, res) => {
+    upload(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return responseStandart(res, err, {}, 500, false);
+      } else if (err) {
+        return responseStandart(res, err, {}, 500, false);
+      }
+      try {
+        const result = await ProductSchema.required().validateAsync(req.body);
+        const dataProduct = {
+          userId: req.user.id,
+          categoryId: result.categoryId,
+          conditionId: result.conditionId,
+          name: result.name,
+          price: result.price,
+          stock: result.stock,
+          description: result.description,
+        };
+        const product = await Product.create(dataProduct);
+        if(product.dataValues){
+          await result.hexa.map((item) => {
+            const dataColor = {
+              productId: product.dataValues.id,
+              name: item,
+              hexa: item,
+            };
+            ProductColor.create(dataColor);
+          });
+          await req.files.map(item => {
+            const dataImage = {
+              productId: product.dataValues.id,
+              picture: item.path,
+            };
+            ProductImage.create(dataImage);
+          });
+          return responseStandart(res, "success create your product", {});
+        }else{
+          return responseStandart(
+            res,
+            "product not found",
+            {},
+            404,
+            false
+          );}
+      } catch (e) {
+        return responseStandart(
+          res,
+          "failed for create product",
+          { ValidationError: e.details[0].message, sqlError: e },
+          400,
+          false
+        );}
+    });
+  },
 
-	// createProductByUserId: (req, res) => {},
-
-	// updateProductByUserId: (req, res) => {},
-	
-	// updateProductAllByUserId: (req, res) => {},
+  postRating: async (req, res) => {
+    try {
+      const result = await RatingsSchema.required().validateAsync(req.body);
+      const dataProductRating = {
+        userId: req.user.id,
+        productId: result.productId,
+        rating: result.rating,
+        comment: result.comment,
+      };
+      await ProductRating.create(dataProductRating);
+      return responseStandart(res, "success add rating for this product", {});
+    } catch (e) {
+      return responseStandart(
+        res,
+        "failed add rating for this product",
+        { ValidationError: e.details[0].message, sqlError: e },
+        400,
+        false
+      );
+    }
+  }
 };
