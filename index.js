@@ -25,19 +25,19 @@ app.listen(APP_PORT, () => {
 //provide static file
 // app.use("/assets/uploads/", express.static("assets/uploads"));
 
-// const homeRouter = require("./src/routes/home");
+const homeRouter = require("./src/routes/home");
 // const productDetailsRouter = require("./src/routes/productDetails");
-// const customerRouter = require("./src/routes/customer");
+const customerRouter = require("./src/routes/customer");
 // const sallerRouter = require("./src/routes/saller");
-// const auth = require("./src/routes/auth");
+const auth = require("./src/routes/auth");
 
 // // attach member router
-// app.use("/auth", auth);
-// app.use("/home", homeRouter);
+app.use("/auth", auth);
+app.use("/home", homeRouter);
 // app.use("/products", productDetailsRouter);
 
 // //Customer auth
-// const customerAuth = require("./src/middlewares/auth");
-// const validation = require("./src/middlewares/rolesValidation");
-// app.use("/customer", customerAuth, validation.customer, customerRouter);
+const customerAuth = require("./src/middlewares/auth");
+const validation = require("./src/middlewares/rolesValidation");
+app.use("/customer", customerAuth, validation.customer, customerRouter);
 // app.use("/saller", customerAuth, validation.saller, sallerRouter);
