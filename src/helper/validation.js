@@ -1,19 +1,27 @@
 const Joi = require("joi");
 
 module.exports = {
-  login: Joi.object({
-    roles_id: Joi.string().valid("customer", "saller").lowercase(),
+  Login: Joi.object({
     email: Joi.string().email(),
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
   }),
 
-  registerCustomer: Joi.object({
+  SignupCustomer: Joi.object({
     name: Joi.string().min(3).max(80),
     email: Joi.string().email(),
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
   }),
-  
-  registerSaller: Joi.object({
+
+  ChangePass: Joi.object({
+    newPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+    confirmNewPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  }),
+
+  ForgotPass: Joi.object({
+    email: Joi.string().email(),
+  }),
+
+  SignupSaller: Joi.object({
     name: Joi.string().min(3).max(80),
     email: Joi.string().email(),
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
@@ -21,7 +29,6 @@ module.exports = {
   }),
 
   User: Joi.object({
-    roles_id: Joi.number().integer().positive(),
     name: Joi.string().min(3).max(80),
     email: Joi.string().email(),
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
@@ -31,23 +38,32 @@ module.exports = {
   }),
 
   Products: Joi.object({
-    category_id: Joi.number().integer().positive(),
-    conditions_id: Joi.number().integer().positive(),
-    user_id: Joi.number().integer().positive(),
+    categoryId: Joi.number().integer().positive(),
+    conditionId: Joi.number().integer().positive(),
     name: Joi.string().min(3).max(80),
     price: Joi.number().integer().positive(),
     stock: Joi.number().integer().positive(),
     description: Joi.string(),
+    hexa: Joi.array(),
+    // status: Joi.array().valid("available", "empty"),
+    // isPrimary: Joi.array().valid(0, 1),
+  }),
+
+  Ratings: Joi.object({
+    productId: Joi.number().integer().positive(),
+    userId: Joi.number().integer().positive(),
+    rating: Joi.number().min(0).max(5),
+    comment: Joi.string(),
   }),
 
   Address: Joi.object({
-    user_id: Joi.number().integer().positive(),
+    userId: Joi.number().integer().positive(),
     name: Joi.string().min(3).max(80),
-    recipient_name: Joi.string().min(3).max(80),
-    recipient_tlp: Joi.number().integer().positive(),
+    recipientName: Joi.string().min(3).max(80),
+    recipientTlp: Joi.number().integer().positive(),
     address: Joi.string(),
     region: Joi.string(),
-    postal_code: Joi.number().integer().positive(),
+    postalCode: Joi.number().integer().positive(),
     isPrimary: Joi.string().valid("true", "false").lowercase(),
   }),
 
@@ -58,13 +74,6 @@ module.exports = {
     totalPrice: Joi.number().integer().positive(),
     isCheck: Joi.string().valid("true", "false").lowercase(),
     status: Joi.string().valid("in", "out").uppercase(),
-  }),
-
-  product_ratings: Joi.object({
-    product_id: Joi.number().integer().positive(),
-    user_id: Joi.number().integer().positive(),
-    rating: Joi.number().min(0).max(5),
-    comment: Joi.string(),
   }),
 
   product_images: Joi.object({
