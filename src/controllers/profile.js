@@ -12,6 +12,16 @@ module.exports = {
   getUser: async (req, res) => {
     try {
       const data = await User.findAll({
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "gender",
+          "dateOfBirth",
+          "picture",
+          "createdAt",
+        ],
         where: {
           id: req.user.id,
         },
