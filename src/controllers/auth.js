@@ -106,7 +106,7 @@ module.exports = {
             id: req.params.id,
           },
         });
-        if(user.length) {
+        if(user) {
           return responseStandart(res, "Change Password Success", {});
         }else{
           return responseStandart(res, "Change Password Failed", {}, 400, false);
