@@ -18,7 +18,7 @@ module.exports = {
         email: result.email,
       };
 
-      const validate = User.findAll({
+      const validate = await User.findAll({
         where: {
           email: user.email,
         },
@@ -51,7 +51,7 @@ module.exports = {
         return responseStandart(res, "Wrong email", {}, 400, false);
       }
     } catch (e) {
-      return responseStandart(res, e.details[0].message, {}, 400, false);
+      return responseStandart(res, e, {}, 400, false);
     }
   },
 
@@ -70,7 +70,7 @@ module.exports = {
         rolesId: 3
       };
 
-      const validate = User.findAll({
+      const validate = await User.findAll({
         where: {
           email: dataUser.email,
         },
@@ -86,7 +86,7 @@ module.exports = {
         return responseStandart(res, "Email already used", {}, 400, false);
       }
     } catch (e) {
-      return responseStandart(res, e.details[0].message, {}, 400, false);
+      return responseStandart(res, e, {}, 400, false);
     }
   },
 
@@ -101,7 +101,7 @@ module.exports = {
         const dataUser = {
           password: hash,
         };
-        const user = User.update(dataUser, {
+        const user = await User.update(dataUser, {
           where: {
             id: req.params.id,
           },
@@ -121,14 +121,14 @@ module.exports = {
         );
       }
     } catch (e) {
-      return responseStandart(res, e.details[0].message, {}, 400, false);
+      return responseStandart(res, e, {}, 400, false);
     }
   },
 
   forgotPass: async (req, res) => {
     try {
       const result = await forgotPassSchema.required().validateAsync(req.body);
-      const validate = User.findAll({
+      const validate = await User.findAll({
         attributes: [
           "id",
           "name",
@@ -155,7 +155,7 @@ module.exports = {
         );
       }
     } catch (e) {
-      return responseStandart(res, e.details[0].message, {}, 400, false);
+      return responseStandart(res, e, {}, 400, false);
     }
   },
 };
