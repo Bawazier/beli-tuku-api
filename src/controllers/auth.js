@@ -76,7 +76,7 @@ module.exports = {
         },
       });
       if (!validate.length) {
-        const user = User.create(dataUser);
+        const user = await User.create(dataUser);
         if(user.length){
           return responseStandart(res, "Signup Success", {});
         }else{
