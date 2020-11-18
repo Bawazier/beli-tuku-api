@@ -18,7 +18,7 @@ module.exports = {
         email: result.email,
       };
 
-      const validate = await User.findAll({
+      const validate = User.findAll({
         where: {
           email: user.email,
         },
@@ -63,7 +63,7 @@ module.exports = {
       const saltRounds = 10;
       const salt = await bcrypt.genSaltSync(saltRounds);
       const hash = await bcrypt.hashSync(result.password, salt);
-      const user = {
+      const dataUser = {
         name: result.name,
         email: result.email,
         password: hash,
@@ -72,13 +72,16 @@ module.exports = {
 
       const validate = User.findAll({
         where: {
-          email: user.email,
+          email: dataUser.email,
         },
-	  });
+      });
       if (!validate.length) {
-        await User.create(user);
-        console.log(validate);
-        return responseStandart(res, "Signup Success", {});
+        const user = User.create(dataUser);
+        if(user.length){
+          return responseStandart(res, "Signup Success", {});
+        }else{
+          return responseStandart(res, "Signup failed", {}, 500, false);
+        }
       } else {
         return responseStandart(res, "Email already used", {}, 400, false);
       }
@@ -95,15 +98,19 @@ module.exports = {
         const salt = await bcrypt.genSaltSync(saltRounds);
         const hash = await bcrypt.hashSync(result.newPassword, salt);
 
-        const user = {
+        const dataUser = {
           password: hash,
         };
-        await User.update(user, {
+        const user = User.update(dataUser, {
           where: {
             id: req.params.id,
           },
         });
-        return responseStandart(res, "Change Password Success", {});
+        if(user.length) {
+          return responseStandart(res, "Change Password Success", {});
+        }else{
+          return responseStandart(res, "Change Password Failed", {}, 400, false);
+        }
       } else {
         return responseStandart(
           res,
@@ -121,7 +128,7 @@ module.exports = {
   forgotPass: async (req, res) => {
     try {
       const result = await forgotPassSchema.required().validateAsync(req.body);
-      const validate = await User.findAll({
+      const validate = User.findAll({
         attributes: [
           "id",
           "name",
