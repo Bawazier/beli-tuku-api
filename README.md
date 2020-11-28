@@ -646,7 +646,7 @@ Response :
 
 Request :
 - Method : PATCH/PUT,
-- Endpoint : `/customer/cart/{id_product}`
+- Endpoint : `/customer/cart/{id_cart}`
 - Header :
     - Content-Type: application/json
     - Accept: application/json
@@ -702,6 +702,241 @@ Response :
       "totalPrice" : "integer",
       "isCheck" : "boolean",
       "status" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Product" : {
+        "id" : "integer, PK",
+        "name" : "string",
+        "price" : "integer",
+        "stock" : "integer",
+        "description" : "string",
+        "createdAt" : "date",
+        "updatedAt" : "date",
+      }
+    }
+  ]
+}
+```
+
+### Checkout Shooping Cart
+
+Request :
+- Method : PUT
+- Endpoint : `/customer/cart/out`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "status" : "out",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### List Checkout Shooping Cart
+
+Request :
+- Method : GET,
+- Endpoint : `/customer/cart`
+- Header :
+  -Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "userId" : "integer",
+      "productId" : "integer",
+      "quantity" : "integer",
+      "totalPrice" : "integer",
+      "isCheck" : "boolean",
+      "status" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Product" : {
+        "id" : "integer, PK",
+        "name" : "string",
+        "price" : "integer",
+        "stock" : "integer",
+        "description" : "string",
+        "createdAt" : "date",
+        "updatedAt" : "date",
+      }
+    }
+  ]
+}
+```
+
+### Post Order
+
+Request : 
+- Method : POST
+- Endpoint : `customer/order`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "status" : "order",
+    "orderNo" : "integer, unique"
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Get Order
+
+Request :
+- Method : GET
+- Endpoint : `customer/order/{id_order}`
+- Header :
+  -Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "results" : {
+    "userId" : "integer",
+    "addressId" : "integer",
+    "orderNo" : "integer, unique",
+    "tracking" : "string, unique",
+    "totalAmount" : "integer",
+    "status" : "string",
+    "discount" : "integer",
+    "delivery" : "integer",
+    "createdAt" : "date",
+    "updatedAt" : "date",
+    "quantity" : "integer",
+    "Address" : {
+      "id" : "integer, PK",
+      "name" : "string",
+      "recipientName" : "string",
+      "recipientTlp" : "string",
+      "address" : "string",
+      "region" : "string",
+      "postalCode" : "string",
+      "isPrimary" : "boolean",
+    }
+  }
+}
+```
+
+### List Order
+
+Request :
+- Method : GET
+- Endpoint : `customer/order`
+- Header :
+    - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+  - sortBy : string || `createdAt`,
+  - sortType : string || `DESC`,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "userId" : "integer",
+      "addressId" : "integer",
+      "orderNo" : "integer, unique",
+      "tracking" : "string, unique",
+      "totalAmount" : "integer",
+      "status" : "string",
+      "discount" : "integer",
+      "delivery" : "integer",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "quantity" : "integer",
+      "Address" : {
+        "id" : "integer, PK",
+        "name" : "string",
+        "recipientName" : "string",
+        "recipientTlp" : "string",
+        "address" : "string",
+        "region" : "string",
+        "postalCode" : "string",
+        "isPrimary" : "boolean",
+      }
+    }
+  ]
+}
+```
+
+### List Order Shooping Cart
+
+Request :
+- Method : GET,
+- Endpoint : `/customer/cart`
+- Header :
+  -Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "userId" : "integer",
+      "productId" : "integer",
+      "quantity" : "integer",
+      "totalPrice" : "integer",
+      "isCheck" : "boolean",
+      "status" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Product" : {
+        "id" : "integer, PK",
+        "name" : "string",
+        "price" : "integer",
+        "stock" : "integer",
+        "description" : "string",
+        "createdAt" : "date",
+        "updatedAt" : "date",
+      }
     }
   ]
 }
