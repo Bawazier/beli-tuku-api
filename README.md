@@ -943,4 +943,60 @@ Response :
 ```
 
 ## Saller API
-Comming Soon
+
+Customer API must use this authentication
+
+Request :
+- Header :
+    - X-Api-Key : "your secret api key"
+
+### Post Product
+
+Request :
+- Method : GET
+- Endpoint : `saller/product`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+  "name" : "string",
+  "price" : "integer",
+  "stock" : "integer",
+  "description" : "string",
+  "categoryId" : "integer",
+  "conditionId" : "integer",
+  "Image" : [
+    {
+      "id" : "integer, Pk",
+      "picture" : "string",
+      "isPrimary" : "boolean"
+    },
+    {
+      "id" : "integer, Pk",
+      "picture" : "string",
+      "isPrimary" : "boolean"
+    }
+  ],
+  "Color" : [
+    {
+      "id" : "integer, Pk",
+      "hexa" : "string"
+    },
+    {
+      "id" : "integer, Pk",
+      "hexa" : "string"
+    }
+  ],
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
