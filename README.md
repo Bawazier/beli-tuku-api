@@ -1,134 +1,708 @@
-# Ecommerce :octocat:
-1. Method Used
-- [x] GET
-- [x] POST
-- [x] PATCH
-- [ ] PUT :construction:
-- [x] DELETE
-2. Routes
-- [x] Admin
-- [x] Home
-- [x] Products
-- [x] Login
-- [x] Saller
-- [x] Customer
-3. Features
-- [x] CRUD
-- [x] JOIN table
-- [x] Hash and compare password
-- [ ] Search :recycle:
-- [ ] Limit :recycle:
-- [ ] Sort :recycle:
-- [ ] Page Info :recycle:
-- [x] Prepared Statement
-- [x] JOI validation
-- [ ] Upload Images :construction:
-- [x] Authentication and Authorization
-- [ ] Roles :construction:
-- [ ] Error Handling :construction:
+# API Specs
 
-## Public Routes
+## Authentication
 
-### Home Route
-#### GET /home/products
+API must use this authentication
 
-> REQUEST PARAMS
+###  Sign Up
 
-KEY | VALUE
---- | -----
-page | \[number of pages\]
-limit | \[max number for data\]
-search | \[some string for search data\]
-sortBy | \[specific order data\]
-sort | \[ASC or DESC for order data\]
+Request : 
+- Method : POST
+- Endpoint : `/auth/signup`
+- Header : 
+  - Content-Type: application/json
+  - Accept: application/json
+- Body :
 
-> Example REQUEST
-```javascript
-var axios = require('axios');
-
-var config = {
-  method: 'get',
-  url: 'http://localhost:5000/home/products/',
-  headers: { }
-};
-
-axios(config)
-.then(function (response) {
-  console.log(JSON.stringify(response.data));
-})
-.catch(function (error) {
-  console.log(error);
-});
-```
-> Example RESPONE
-```javascript
+```json 
 {
-    success: true,
-    message: 'Get All Procucts Success',
-    data: [
-        {
-            "user_id": 26,
-            "category_id": 24,
-            "conditions_id": 1,
-            "name": "Polo Shirt",
-            "price": 1000000,
-            "stock": 20,
-            "maxSize": 45,
-            "description": "Filma production",
-            "saller_name": "FILMA",
-            "category_name": "T-Shirt",
-            "conditions_status": "New",
-            "created_at": "26 September 2020",
-            "updated_at": "26 September 2020"
-        }
-    ],
-    "pageInfo": {
-        "count": 1,
-        "pages": 1,
-        "currentPage": 1,
-        "limitPage": 5,
-        "nextLink": null,
-        "prevLink": null
-    }
+    "name" : "string",
+    "email" : "string, unique",
+    "password" : "string",
 }
 ```
-#### GET /home/categories
-> Example REQUEST
-```javascript
-var axios = require('axios');
 
-var config = {
-  method: 'get',
-  url: 'http://localhost:5000/home/categories/',
-  headers: { }
-};
-
-axios(config)
-.then(function (response) {
-  console.log(JSON.stringify(response.data));
-})
-.catch(function (error) {
-  console.log(error);
-});
-```
-> Example RESPONE
-```javascript
+Response :
+```json
 {
-    success: true,
-    message: 'Get All Procucts Success',
-    data: [
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+###  Sign In
+
+Request : 
+- Method : POST
+- Endpoint : `/auth/signin`
+- Header : 
+  - Content-Type: application/json
+  - Accept: application/json
+- Body :
+
+```json 
+{
+    "email" : "string, unique",
+    "password" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Validation Forgot Password
+
+Request : 
+- Method : POST
+- Endpoint : `/auth/forgot/password`
+- Header : 
+  - Content-Type: application/json
+  - Accept: application/json
+- Body :
+
+```json 
+{
+    "email" : "string, unique",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "id" : "integer"
+}
+```
+
+###  Forgot Password
+
+Request : 
+- Method : POST
+- Endpoint : `/auth/forgot/password/{id_user}`
+- Header : 
+  - Content-Type: application/json
+  - Accept: application/json
+- Body :
+
+```json 
+{
+    "newPassword" : "string",
+    "confirmPassword" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+## Public API
+
+public api does not need authentication
+
+### List Products
+
+Request :
+- Method : GET
+- Endpoint : `/public/products`
+- Header :
+  - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+  - sortBy : string || `createdAt`,
+  - sortType : string || `DESC`,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    }
+  ]
+}
+```
+
+### List Popular Products
+
+Request :
+- Method : GET
+- Endpoint : `/public/popular/products`
+- Header :
+  - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    }
+  ]
+}
+```
+
+### List Categories
+
+Request :
+- Method : GET
+- Endpoint : `/public/categories`
+- Header :
+  - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "picture" : "string",
+      "color" : "color",
+      "createdAt" : "date",
+      "updatedAt" : "date"
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "picture" : "string",
+      "color" : "color",
+      "createdAt" : "date",
+      "updatedAt" : "date"
+    },
+  ]
+}
+```
+
+### List Products By Categories
+
+Request :
+- Method : GET
+- Endpoint : `/public/products/categories/{id_category}`
+- Header :
+  - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+  - sortBy : string || `createdAt`,
+  - sortType : string || `DESC`,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : {"picture" : "string"},
+      "Rating" : "number"
+    }
+  ]
+}
+```
+
+### Get Details Product
+
+Request :
+- Method : GET
+- Endpoint : `/public/products/{id_product}`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "results" : {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Category" : {"status" : "name"},
+      "Condition" : {"status" : "string"},
+      "User" : {"name" : "string", "picture" : "string"},
+      "Image" : [
         {
-            "id": 24,
-            "name": "T-Shirt",
-            "image": "assets/uploads/1600989276723-hiclipart 15.png",
-            "URL_image": "http://localhost:5000/assets/uploads/1600989276723-hiclipart 15.png"
+          "id" : "integer, Pk",
+          "picture" : "string",
+          "isPrimary" : "boolean"
         },
         {
-            "id": 27,
-            "name": "Teknologi",
-            "image": "assets/uploads/1601220206619-hiclipart 21.png",
-            "URL_image": "http://localhost:5000/assets/uploads/1601220206619-hiclipart 21.png"
+          "id" : "integer, Pk",
+          "picture" : "string",
+          "isPrimary" : "boolean"
         }
-    ]
+      ],
+      "Color" : [
+        {
+          "id" : "integer, Pk",
+          "hexa" : "string"
+        },
+        {
+          "id" : "integer, Pk",
+          "hexa" : "string"
+        }
+      ],
+      "Ratings" : [
+        {
+          "id" : "integer, Pk",
+          "userId" : "integer",
+          "rating" : "integer",
+          "comment" : "string",
+        },
+        {
+          "id" : "integer, Pk",
+          "userId" : "integer",
+          "rating" : "integer",
+          "comment" : "string",
+        }
+      ],
+      "Rating" : "number"
+  }
+}
+```
+
+## Customer API
+
+Customer API must use this authentication
+
+Request :
+- Header :
+    - X-Api-Key : "your secret api key"
+
+### Get Account
+
+Request :
+- Method : GET
+- Endpoint : `/customer/account`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "results" : {
+    "id" : "integer, PK",
+    "name" : "string",
+    "email" : "string",
+    "phone" : "string",
+    "gender" : "string",
+    "dateOfBirth" : "date",
+    "picture" : "string",
+    "createdAt" : "date",
+    "updatedAt" : "date",
+    "URL_picture" : "string",
+  }
+}
+```
+
+### Update Account
+
+Request :
+- Method : PATCH/PUT
+- Endpoint : `/customer/account`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "name" : "string",
+    "email" : "string",
+    "phone" : "string",
+    "gender" : "string",
+    "dateOfBirth" : "date",
+    "picture" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Post Address
+
+Request :
+- Method : POST
+- Endpoint : `/customer/address`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "name" : "string",
+    "recipientName" : "string",
+    "recipientTlp" : "string",
+    "address" : "string",
+    "region" : "string",
+    "postalCode" : "string",
+    "isPrimary" : "boolean",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Update Address
+
+Request :
+- Method : PATCH/PUT
+- Endpoint : `/customer/address/{id_address}`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "name" : "string",
+    "recipientName" : "string",
+    "recipientTlp" : "string",
+    "address" : "string",
+    "region" : "string",
+    "postalCode" : "string",
+    "isPrimary" : "boolean",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Get Address
+
+Request :
+- Method : GET
+- Endpoint : `/customer/address/{id_address}`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "results" : {
+      "id" : "integer, PK",
+      "name" : "string",
+      "recipientName" : "string",
+      "recipientTlp" : "string",
+      "address" : "string",
+      "region" : "string",
+      "postalCode" : "string",
+      "isPrimary" : "boolean",
+  },
+}
+```
+
+### List Address
+
+Request :
+- Method : GET
+- Endpoint : `/customer/account`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "recipientName" : "string",
+      "recipientTlp" : "string",
+      "address" : "string",
+      "region" : "string",
+      "postalCode" : "string",
+      "isPrimary" : "boolean",
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "recipientName" : "string",
+      "recipientTlp" : "string",
+      "address" : "string",
+      "region" : "string",
+      "postalCode" : "string",
+      "isPrimary" : "boolean",
+    },
+  ]
+}
+```
+
+### Delete Address
+
+Request :
+- Method : DELETE
+- Endpoint : `/customer/address/{id_address}`
+- Header :
+    - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Post Product Ratings
+
+Request :
+- Method : POST
+- Endpoint : `/customer/rating/product/{id_product}`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "rating" : "string",
+    "comment" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Post Shooping Cart
+
+Request :
+- Method : POST,
+- Endpoint : `/customer/cart/{id_product}`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "quantity" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### Update Shooping Cart
+
+Request :
+- Method : PATCH/PUT,
+- Endpoint : `/customer/cart/{id_product}`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+- Body :
+
+```json 
+{
+    "quantity" : "string",
+    "isCheck" : "boolean",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
+### List Shooping Cart
+
+Request :
+- Method : GET,
+- Endpoint : `/customer/cart`
+- Header :
+  -Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+  - sortBy : string || `createdAt`,
+  - sortType : string || `DESC`,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+    "count" : "number",
+    "pages" : "number",
+    "limit" : "number",
+    "nextLink" : "string",
+    "prevLink" : "string",
+  },
+  "results" : [
+    {
+      "id" : "integer, PK",
+      "userId" : "integer",
+      "productId" : "integer",
+      "quantity" : "integer",
+      "totalPrice" : "integer",
+      "isCheck" : "boolean",
+      "status" : "string",
+    }
+  ]
 }
 ```
