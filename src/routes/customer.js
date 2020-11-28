@@ -3,7 +3,6 @@ const profile = require("../controllers/profile");
 const cart = require("../controllers/cart");
 const order = require("../controllers/order");
 const address = require("../controllers/address");
-// const ratings = require('../controllers/ratings');
 const products = require("../controllers/products");
 
 router.get("/account", profile.getAccount);
@@ -28,7 +27,5 @@ router.get("/cart/order", cart.listOrderCart);
 router.post("/order", order.postOrder);
 router.get("/order/:id", order.getOrder);
 router.get("/order", order.listOrder);
-
-// router.post("/product/demo", products.postProduct);
 
 module.exports = router;
