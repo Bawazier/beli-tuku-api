@@ -543,7 +543,7 @@ Response :
 
 Request :
 - Method : GET
-- Endpoint : `/customer/account`
+- Endpoint : `/customer/address`
 - Header :
   - Accept: application/json
 
@@ -941,3 +941,6 @@ Response :
   ]
 }
 ```
+
+## Saller API
+Comming Soon
