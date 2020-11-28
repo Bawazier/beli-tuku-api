@@ -1,31 +1,34 @@
 const router = require("express").Router();
 const profile = require("../controllers/profile");
-// const cart = require('../controllers/cart');
+const cart = require("../controllers/cart");
+const order = require("../controllers/order");
 const address = require("../controllers/address");
 // const ratings = require('../controllers/ratings');
 const products = require("../controllers/products");
 
-router.get("/profile/account", profile.getUser);
-router.patch("/profile/account", profile.patchUser);
-router.put("/profile/account", profile.putUser);
-router.post("/product/demo", products.postProduct);
-router.post("/product/rating", products.postRating);
+router.get("/account", profile.getAccount);
+router.patch("/account", profile.patchAccount);
+router.put("/account", profile.putAccount);
 
-router.get("/profile/address", address.getAddress);
-router.get("/profile/address/:id", address.getAddressId);
-router.post("/profile/address", address.postAddress);
-router.patch("/profile/address/:id", address.patchAddress);
-// router.put('/profile/address/:id', address.updateAddressAllByUserId);
-// router.put('/profile/address/primary/:id', address.updatePrimaryAddress);
+router.post("/address", address.postAddress);
+router.patch("/address/:id", address.patchAddress);
+router.get("/address/:id", address.getAddressId);
+router.get("/address", address.listAddress);
+router.delete("/address/:id", address.deleteAddress);
 
-// router.get('/cart/in', cart.findByStatusIn);
-// router.get('/cart/out', cart.findByStatusOut);
-// router.post('/cart/product/:id', cart.addCart);
-// router.patch('/cart/in/:id', cart.createCart);
-// router.patch('/cart/out/', cart.chekOut);
+router.post("/rating/product/:id", products.postRating);
 
-// router.get('/ratings/user', ratings.findByUserId);
-// router.post('/ratings/product/:id', ratings.createRatings);
-// router.patch('/ratings/product/:id', ratings.updateRatings);
+router.post("/cart/:id", cart.postCart);
+router.patch("/cart/:id", cart.pathCart);
+router.get("/cart", cart.listCart);
+router.put("/cart/out", cart.chekoutCart);
+router.get("/cart/out", cart.listChekoutCart);
+router.get("/cart/order", cart.listOrderCart);
+
+router.post("/order", order.postOrder);
+router.get("/order/:id", order.getOrder);
+router.get("/order", order.listOrder);
+
+// router.post("/product/demo", products.postProduct);
 
 module.exports = router;

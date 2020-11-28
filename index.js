@@ -26,15 +26,12 @@ app.listen(APP_PORT, () => {
 app.use("/assets/uploads/", express.static("assets/uploads"));
 
 const homeRouter = require("./src/routes/home");
-// const productDetailsRouter = require("./src/routes/productDetails");
 const customerRouter = require("./src/routes/customer");
-// const sallerRouter = require("./src/routes/saller");
 const auth = require("./src/routes/auth");
 
 // // attach member router
 app.use("/auth", auth);
-app.use("/home", homeRouter);
-// app.use("/products", productDetailsRouter);
+app.use("/public", homeRouter);
 
 // //Customer auth
 const customerAuth = require("./src/middlewares/auth");
