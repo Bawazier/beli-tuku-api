@@ -38,10 +38,11 @@ module.exports = {
             };
             ProductColor.create(dataColor);
           });
-          await req.files.map(item => {
+          await req.files.map((item, index) => {
             const dataImage = {
               productId: product.dataValues.id,
               picture: item.path,
+              isPrimary: index === 0 ? true : false,
             };
             ProductImage.create(dataImage);
           });
@@ -55,13 +56,8 @@ module.exports = {
             false
           );}
       } catch (e) {
-        return responseStandart(
-          res,
-          "failed for create product",
-          { ValidationError: e.details[0].message, sqlError: e },
-          400,
-          false
-        );}
+        return responseStandart(res, e, {}, 400, false);
+      }
     });
   },
 
@@ -77,13 +73,7 @@ module.exports = {
       await ProductRating.create(dataProductRating);
       return responseStandart(res, "success add rating for this product", {});
     } catch (e) {
-      return responseStandart(
-        res,
-        "failed add rating for this product",
-        { ValidationError: e.details[0].message, sqlError: e },
-        400,
-        false
-      );
+      return responseStandart(res, e, {}, 400, false);
     }
   }
 };
