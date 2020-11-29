@@ -11,7 +11,7 @@ const changePassSchema = schema.ChangePass;
 const forgotPassSchema = schema.ForgotPass;
 
 module.exports = {
-  login: async (req, res) => {
+  signin: async (req, res) => {
     try {
       const result = await loginSchema.required().validateAsync(req.body);
       const user = {
@@ -37,7 +37,6 @@ module.exports = {
               if (!err) {
                 return responseStandart(res, "Loggin Success", {
                   token: token,
-                  auth: { id: validate[0].id },
                 });
               } else {
                 return responseStandart(res, err, {}, 403, false);
@@ -67,7 +66,7 @@ module.exports = {
         name: result.name,
         email: result.email,
         password: hash,
-        rolesId: 3
+        rolesId: req.params.id
       };
 
       const validate = await User.findAll({
@@ -90,7 +89,7 @@ module.exports = {
     }
   },
 
-  changePass: async (req, res) => {
+  forgotPass: async (req, res) => {
     try {
       const result = await changePassSchema.required().validateAsync(req.body);
       if (result.newPassword === result.confirmNewPassword) {
@@ -101,16 +100,12 @@ module.exports = {
         const dataUser = {
           password: hash,
         };
-        const user = await User.update(dataUser, {
+        await User.update(dataUser, {
           where: {
             id: req.params.id,
           },
         });
-        if(user) {
-          return responseStandart(res, "Change Password Success", {});
-        }else{
-          return responseStandart(res, "Change Password Failed", {}, 400, false);
-        }
+        return responseStandart(res, "Change Password Success", {});
       } else {
         return responseStandart(
           res,
@@ -125,7 +120,7 @@ module.exports = {
     }
   },
 
-  forgotPass: async (req, res) => {
+  validateForgotPass: async (req, res) => {
     try {
       const result = await forgotPassSchema.required().validateAsync(req.body);
       const validate = await User.findAll({
@@ -133,11 +128,6 @@ module.exports = {
           "id",
           "name",
           "email",
-          "phone",
-          "gender",
-          "dateOfBirth",
-          "picture",
-          "createdAt",
         ],
         where: {
           email: result.email,
