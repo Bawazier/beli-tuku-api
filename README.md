@@ -396,6 +396,31 @@ Request :
 - Header :
     - X-Api-Key : "your secret api key"
 
+### Change Password
+
+- Method : POST
+- Endpoint : `/customer/change/password`
+- Header : 
+  - Content-Type: application/json
+  - Accept: application/json
+- Body :
+
+```json 
+{
+    "oldPassword" : "string",
+    "newPassword" : "string",
+    "confirmPassword" : "string",
+}
+```
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
 ### Get Account
 
 Request :
@@ -796,7 +821,8 @@ Request :
 ```json 
 {
     "status" : "order",
-    "orderNo" : "integer, unique"
+    "noOrder" : "string, unique",
+    "noTracking" : "string, unique",
 }
 ```
 
@@ -824,8 +850,8 @@ Response :
   "results" : {
     "userId" : "integer",
     "addressId" : "integer",
-    "orderNo" : "integer, unique",
-    "tracking" : "string, unique",
+    "noOrder" : "string, unique",
+    "noTracking" : "string, unique",
     "totalAmount" : "integer",
     "status" : "string",
     "discount" : "integer",
@@ -877,8 +903,8 @@ Response :
     {
       "userId" : "integer",
       "addressId" : "integer",
-      "orderNo" : "integer, unique",
-      "tracking" : "string, unique",
+      "noOrder" : "string, unique",
+      "noTracking" : "string, unique",
       "totalAmount" : "integer",
       "status" : "string",
       "discount" : "integer",
@@ -926,6 +952,7 @@ Response :
       "totalPrice" : "integer",
       "isCheck" : "boolean",
       "status" : "string",
+      "noOrder" : "string",
       "createdAt" : "date",
       "updatedAt" : "date",
       "Product" : {
