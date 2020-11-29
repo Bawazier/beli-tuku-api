@@ -8,7 +8,7 @@ API must use this authentication
 
 Request : 
 - Method : POST
-- Endpoint : `/auth/signup`
+- Endpoint : `/auth/signup/{id_roles}`
 - Header : 
   - Content-Type: application/json
   - Accept: application/json
@@ -76,7 +76,13 @@ Response :
 {
   "status" : "boolean",
   "message" : "string",
-  "id" : "integer"
+  "validate": [
+    {
+        "id": "integer, PK",
+        "name": "string",
+        "email": "string"
+    }
+  ]
 }
 ```
 
