@@ -11,38 +11,63 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-   return queryInterface.bulkInsert("Categories", [
-     {
-       name: "Accessories",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-     {
-       name: "Formal suit",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-     {
-       name: "T-Shirt",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-     {
-       name: "Jacket",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-     {
-       name: "Pants",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-     {
-       name: "Shoes",
-       createdAt: new Date(),
-       updatedAt: new Date(),
-     },
-   ]);
+    return queryInterface.bulkInsert("Categories", [
+      {
+        name: "Women's Clothing",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Women's Shoes",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Women's Accessories",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Women's Bags & HandBags",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Men's Clothing",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Men's Shoes",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Men's Accessories",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Kid's Accessories",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Jewelry",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Watches, Parts & Accessories",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Kid's Accessories",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
   },
 
   down: async (queryInterface, Sequelize) => {

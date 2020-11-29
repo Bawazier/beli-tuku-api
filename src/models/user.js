@@ -12,29 +12,34 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.belongsTo(models.Roles, {
-        foreignKey: "rolesId"
+        foreignKey: "rolesId",
       });
       User.hasMany(models.Product, {
         foreignKey: "userId"
       });
-      User.hasMany(models.ProductRating, {
-        foreignKey: "userId",
-      });
       User.hasMany(models.UserAddress, {
-        foreignKey: "userId",
+        foreignKey: "userId"
+      });
+      User.hasOne(models.Credit, {
+        foreignKey: "userId"
       });
       User.hasMany(models.Cart, {
-        foreignKey: "userId",
+        foreignKey: "userId"
+      });
+      User.hasMany(models.Order, {
+        foreignKey: "userId"
+      });
+      User.hasMany(models.ProductRating, {
+        foreignKey: "userId"
       });
     }
   }
-  
   User.init({
     rolesId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    phone: DataTypes.INTEGER,
+    phone: DataTypes.STRING,
     gender: DataTypes.STRING,
     dateOfBirth: DataTypes.DATEONLY,
     picture: DataTypes.STRING

@@ -18,7 +18,12 @@ module.exports = {
        updatedAt: new Date(),
      },
      {
-       status: "Older",
+       status: "Second",
+       createdAt: new Date(),
+       updatedAt: new Date(),
+     },
+     {
+       status: "Used",
        createdAt: new Date(),
        updatedAt: new Date(),
      },
