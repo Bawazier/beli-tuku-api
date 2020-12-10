@@ -2,30 +2,68 @@ const Joi = require("joi");
 
 module.exports = {
   Login: Joi.object({
-    email: Joi.string().email(),
-    password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+    email: Joi.string().email().required(),
+    password: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
   }),
 
   SignupCustomer: Joi.object({
-    name: Joi.string().min(3).max(80),
-    email: Joi.string().email(),
-    password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-  }),
-
-  ChangePass: Joi.object({
-    newPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-    confirmNewPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-  }),
-
-  ForgotPass: Joi.object({
-    email: Joi.string().email(),
+    name: Joi.string().min(3).max(80).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
   }),
 
   SignupSaller: Joi.object({
+    name: Joi.string().min(3).max(80).required(),
+    email: Joi.string().email().required(),
+    phoneNumber: Joi.number()
+      .integer()
+      .min(1000000000)
+      .max(99999999999)
+      .required(),
+    storeName: Joi.string().min(3).max(80).required(),
+    password: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+  }),
+
+  ForgotPass: Joi.object({
+    newPassword: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+    confirmNewPassword: Joi.string().valid(Joi.ref("newPassword")).required(),
+  }),
+
+  ValidationForgotPass: Joi.object({
+    email: Joi.string().email().required(),
+  }),
+
+  ChangePass: Joi.object({
+    oldPassword: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+    newPassword: Joi.string()
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+    confirmNewPassword: Joi.string().valid(Joi.ref("newPassword")).required(),
+  }),
+
+  SellingProduct: Joi.object({
+    categoryId: Joi.number().integer().positive(),
+    conditionId: Joi.number().integer().positive(),
     name: Joi.string().min(3).max(80),
-    email: Joi.string().email(),
-    password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-    phone: Joi.number().integer(),
+    price: Joi.number().integer().positive(),
+    stock: Joi.number().integer().positive(),
+    description: Joi.string(),
+
+    nameColor: Joi.array().min(1).max(4),
+    hexaColor: Joi.array().min(1).max(4),
+    statusColor: Joi.array().min(1).max(4),
+
+    size: Joi.array().min(1).max(4),
   }),
 
   User: Joi.object({
