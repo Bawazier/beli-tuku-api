@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Order.belongsTo(models.User, {
         foreignKey: "userId"
       });
+      Order.belongsTo(models.Address, {
+        foreignKey: "addressId"
+      });
     }
   }
   Order.init({

@@ -18,8 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Credit.init({
     userId: DataTypes.INTEGER,
-    saldo: DataTypes.BIGINT,
-    topUp: DataTypes.INTEGER
+    saldo: DataTypes.BIGINT
   }, {
     sequelize,
     modelName: "Credit",

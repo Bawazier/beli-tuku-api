@@ -11,19 +11,13 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert("Conditions", [
+    return queryInterface.bulkInsert("Users", [
       {
-        status: "New",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        status: "Second",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        status: "Used",
+        roleId: 2,
+        name: "Example User",
+        email: "example@gmail.com",
+        password: "example123",
+        phone: "8131213456",
         createdAt: new Date(),
         updatedAt: new Date(),
       },

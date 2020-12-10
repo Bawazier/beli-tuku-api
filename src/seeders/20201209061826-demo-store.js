@@ -11,19 +11,10 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert("Conditions", [
+    return queryInterface.bulkInsert("Stores", [
       {
-        status: "New",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        status: "Second",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        status: "Used",
+        userId: 1,
+        name: "Example Store",
         createdAt: new Date(),
         updatedAt: new Date(),
       },

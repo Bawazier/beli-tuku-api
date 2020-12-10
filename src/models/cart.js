@@ -14,14 +14,14 @@ module.exports = (sequelize, DataTypes) => {
       Cart.belongsTo(models.User, {
         foreignKey: "userId"
       });
-      Cart.belongsTo(models.Product, {
-        foreignKey: "productId"
+      Cart.belongsTo(models.DetailProduct, {
+        foreignKey: "detailProductId"
       });
     }
   }
   Cart.init({
     userId: DataTypes.INTEGER,
-    productId: DataTypes.INTEGER,
+    detailProductId: DataTypes.INTEGER,
     quantity: DataTypes.INTEGER,
     totalPrice: DataTypes.INTEGER,
     isCheck: DataTypes.BOOLEAN,

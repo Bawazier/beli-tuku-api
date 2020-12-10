@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-
   Condition.init({
     status: DataTypes.STRING
   }, {

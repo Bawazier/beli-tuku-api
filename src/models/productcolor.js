@@ -12,16 +12,16 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       ProductColor.belongsTo(models.Product, {
-        foreignKey: "productId",
+        foreignKey: "productId"
       });
     }
   }
-  
   ProductColor.init({
     productId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     hexa: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    isPrimary: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: "ProductColor",
