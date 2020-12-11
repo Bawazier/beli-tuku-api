@@ -18,7 +18,7 @@ module.exports = {
         return responseStandart(res, err, {}, 500, false);
       }
       try {
-        const results = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
           try {
             const result = await SellingProductSchema.required().validateAsync(
               req.body
@@ -72,62 +72,33 @@ module.exports = {
               { transaction: t }
             );
             await ProductImage.bulkCreate(
-              [
-                {
+              [...req.files.map((item, index) => {
+                return {
                   productId: product.dataValues.id,
-                  picture: req.files[0].path,
-                  isPrimary: true,
-                },
-                {
-                  productId: product.dataValues.id,
-                  picture: req.files[1].path,
-                  isPrimary: false,
-                },
-                {
-                  productId: product.dataValues.id,
-                  picture: req.files[2].path,
-                  isPrimary: false,
-                },
-                {
-                  productId: product.dataValues.id,
-                  picture: req.files[3].path,
-                  isPrimary: false,
-                },
-              ],
+                  picture: item.path,
+                  isPrimary: index === 0 ? true : false,
+                };
+              })],
               { transaction: t }
             );
             await ProductSize.bulkCreate(
               [
-                {
-                  productId: product.dataValues.id,
-                  size: result.size[0],
-                  isPrimary: true,
-                },
-                {
-                  productId: product.dataValues.id,
-                  size: result.size[1],
-                  isPrimary: false,
-                },
-                {
-                  productId: product.dataValues.id,
-                  size: result.size[2],
-                  isPrimary: false,
-                },
-                {
-                  productId: product.dataValues.id,
-                  size: result.size[3],
-                  isPrimary: false,
-                },
+                ...result.size.map((item, index) => {
+                  return {
+                    productId: product.dataValues.id,
+                    size: item,
+                    isPrimary: index === 0 ? true : false,
+                  };
+                }),
               ],
               { transaction: t }
             );
+            return responseStandart(res, "has successfully sold the product", {
+              results: product,
+            });
           } catch (errs) {
             return responseStandart(res, errs, {}, 500, false);
           }
-        });
-        console.log(results);
-        return responseStandart(res, "has successfully sold the product", {
-          results,
         });
       } catch (e) {
         return responseStandart(res, e, {}, 400, false);

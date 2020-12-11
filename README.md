@@ -12,7 +12,7 @@ Request :
 - Header : 
   - Content-Type: application/json
   - Accept: application/json
-- Body :
+- Body for customer:
 
 ```json 
 {
@@ -21,12 +21,31 @@ Request :
     "password" : "string",
 }
 ```
+- Body for saller:
+
+```json 
+{
+    "name" : "string",
+    "email" : "string, unique",
+    "phoneNumber": "bigint",
+    "storeName": "string",
+    "password" : "string",
+}
+```
 
 Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  // only for customer
+  "credit": {
+    "id": "integer, PK",
+    "userId": "integer",
+    "saldo": "integer",
+    "createdAt": "date",
+    "updatedAt": "date",
+  } 
 }
 ```
 
@@ -51,7 +70,8 @@ Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  "token": "string"
 }
 ```
 

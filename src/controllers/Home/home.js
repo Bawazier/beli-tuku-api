@@ -1,4 +1,5 @@
 const {
+  User,
   Product,
   Category,
   Condition,
@@ -171,6 +172,10 @@ module.exports = {
           {
             model: RatingImage,
             attributes: ["id", "picture"],
+          },
+          {
+            model: User,
+            attributes: ["id", "name", "picture"],
           },
         ],
         where: {

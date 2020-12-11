@@ -157,7 +157,7 @@ module.exports = {
               transaction: t,
             }
           );
-          return { totalAmount: cart.totalPrice * (req.body.quantity || 1) };
+          return { totalPrice: cart.totalPrice * (req.body.quantity || 1) };
         }else{
           return { message: "cart is up to date"};
         }
@@ -168,47 +168,149 @@ module.exports = {
     return responseStandart(res, "checkout cart success", { results });
   },
 
-  orderByCredit: async (req, res) => {
-    const results = await sequelize.transaction(async (t) => {
+  discardCheckoutCart: async (req, res) => {
+    await sequelize.transaction(async (t) => {
       try {
-        // const address = await Address.findOne(
-        //   {
-        //     where: {
-        //       userId: req.user.id,
-        //       isPrimary: true,
-        //     },
-        //   },
-        //   {
-        //     transaction: t,
-        //   }
-        // );
-        // if (address !== null) {
-        const cart = await Cart.findAll(
+        const cart = await Cart.findOne(
           {
-            where: { userId: req.user.id, isCheck: false, status: "OUT" },
+            where: {
+              userId: req.user.id,
+              status: "OUT",
+              isCheck: false,
+            },
           },
           {
             transaction: t,
           }
         );
-        let totalAmount = 0;
-        totalAmount += cart.map((item) => item.totalPrice);
-        //   const credit = await Credit.findOne({where: {userId: req.user.id}},
-        //     {
-        //       transaction: t,
-        //     });
-        //   if(credit.saldo >= cart.totalPrice){
-        //     const
-        //   }
-        // } else {
-        //   return { message: "cart is up to date" };
-        // }
-        return totalAmount;
+        if (cart !== null) {
+          await Cart.update(
+            {
+              isCheck: true,
+              status: "IN",
+            },
+            {
+              where: {
+                userId: req.user.id,
+                status: "OUT",
+                isCheck: false,
+              },
+            },
+            {
+              transaction: t,
+            }
+          );
+          return responseStandart(res, "discard checkout cart success", { cart });
+        } else {
+          return responseStandart(
+            res,
+            "You do not have items with check out status",
+            {},
+            400,
+            false
+          );
+        }
       } catch (err) {
         return responseStandart(res, err, {}, 500, false);
       }
     });
-    return responseStandart(res, "order cart success", { results });
+  },
+
+  orderByCredit: async (req, res) => {
+    await sequelize.transaction(async (t) => {
+      try {
+        const address = await Address.findOne(
+          {
+            where: {
+              userId: req.user.id,
+              isPrimary: true,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+        if (address !== null) {
+          const cart = await Cart.findAll(
+            {
+              where: { userId: req.user.id, isCheck: false, status: "OUT" },
+            },
+            {
+              transaction: t,
+            }
+          );
+          const totalPrice = cart.map((item) => item.totalPrice);
+          let totalAmount = 0;
+          for(let i = 0; i < totalPrice.length; i++){
+            totalAmount += totalPrice[i];
+          }
+          const credit = await Credit.findOne({where: {userId: req.user.id}},
+            {
+              transaction: t,
+            });
+          if(credit.saldo >= totalAmount){
+            const currentBalance = await Credit.update(
+              { saldo: credit.saldo - totalAmount - 20000 },
+              { where: { userId: req.user.id } },
+              {
+                transaction: t,
+              }
+            );
+            const order = await Order.create(
+              {
+                userId: req.user.id,
+                addressId: address.id,
+                noOrder: Math.random()
+                  .toString(36)
+                  .replace(/[^a-z]+/g, "")
+                  .substr(0, 5),
+                noTracking: Math.random()
+                  .toString(36)
+                  .replace(/[^a-z]+/g, "")
+                  .substr(0, 5),
+                totalAmount: totalAmount,
+                status: "packed",
+                delivery: 20000,
+              },
+              {
+                transaction: t,
+              }
+            );
+
+            await Cart.update(
+              { status: "ORDER", noOrder: order.dataValues.noOrder },
+              { where: { userId: req.user.id, isCheck: false, status: "OUT" } },
+              {
+                transaction: t,
+              }
+            );
+            return responseStandart(
+              res,
+              "Your order will be delivered soon. Thank you for choosing our app!",
+              { currentBalance: currentBalance.saldo, order }
+            );
+          }else{
+            return responseStandart(
+              res,
+              "your balance is not sufficient to make a payment, please do a top up first",
+              {},
+              400,
+              false
+            );
+          }
+        } else {
+          return responseStandart(
+            res,
+            "Please fill in your shipping address first",
+            {},
+            400,
+            false
+          );
+        }
+      } catch (err) {
+        return responseStandart(res, err, {}, 500, false);
+      }
+    });
   },
 
   listCart: async (req, res) => {
