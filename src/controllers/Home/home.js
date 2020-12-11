@@ -76,15 +76,6 @@ module.exports = {
             attributes: ["id", "picture", "isPrimary"],
             where: { isPrimary: 1 },
           },
-          {
-            model: ProductRating,
-            attributes: ["id", "rating"],
-            where: {
-              rating: { [Op.gte]: 5 },
-            },
-            order: [["rating", "DESC"]],
-            limit: 1,
-          },
         ],
         where: {
           name: {
@@ -179,7 +170,8 @@ module.exports = {
           },
         ],
         where: {
-          name: {
+          productId: req.params.id,
+          comment: {
             [Op.substring]: search,
           },
         },
