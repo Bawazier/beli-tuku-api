@@ -188,7 +188,7 @@ module.exports = {
         validation.password
       );
       if (comparePass) {
-        const hash = await bcrypt.hashSync(result.password, salt);
+        const hash = await bcrypt.hashSync(result.newPassword, salt);
         await User.update({ password: hash }, { where: { id: req.user.id } });
         return responseStandart(res, "success change password", {});
       } else {
