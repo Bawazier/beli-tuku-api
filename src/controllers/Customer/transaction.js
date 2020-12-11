@@ -266,10 +266,7 @@ module.exports = {
                 {
                   userId: req.user.id,
                   addressId: address.id,
-                  noOrder: Math.random()
-                    .toString(36)
-                    .replace(/[^a-z]+/g, "")
-                    .substr(0, 5),
+                  noOrder: Math.random(),
                   noTracking: Math.random()
                     .toString(36)
                     .replace(/[^a-z]+/g, "")
