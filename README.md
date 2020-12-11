@@ -202,33 +202,33 @@ Response :
                     "name": "string",
                     "hexa": "string",
                     "status": "available" || "empty",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
                 {
                     "id": "integer",
                     "name": "string",
                     "hexa": "string",
                     "status": "available" || "empty",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
             ],
       "ProductSizes": [
                 {
                     "id": "integer",
                     "size": "string",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
                 {
                     "id": "integer",
                     "size": "string",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
             ],
       "ProductImages": [
                 {
                     "id": "integer",
                     "picture": "string, path",
-                    "isPrimary": true
+                    "isPrimary": "true"
                 }
             ],
       "ratings" : "number"
@@ -327,33 +327,33 @@ Response :
                     "name": "string",
                     "hexa": "string",
                     "status": "available" || "empty",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
                 {
                     "id": "integer",
                     "name": "string",
                     "hexa": "string",
                     "status": "available" || "empty",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
             ],
       "ProductSizes": [
                 {
                     "id": "integer",
                     "size": "string",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
                 {
                     "id": "integer",
                     "size": "string",
-                    "isPrimary": boolean
+                    "isPrimary": "boolean"
                 },
             ],
       "ProductImages": [
                 {
                     "id": "integer",
                     "picture": "string, path",
-                    "isPrimary": true
+                    "isPrimary": "boolean"
                 }
             ],
       "ratings" : "number"
@@ -443,7 +443,7 @@ Request :
 {
     "oldPassword" : "string",
     "newPassword" : "string",
-    "confirmPassword" : "string",
+    "confirmNewPassword" : "string",
 }
 ```
 
@@ -479,6 +479,13 @@ Response :
     "createdAt" : "date",
     "updatedAt" : "date",
     "URL_picture" : "string",
+    "Credit": {
+                "id": "integer",
+                "userId": "integer",
+                "saldo": "integer",
+                "createdAt": "date",
+                "updatedAt": "date"
+            },
   }
 }
 ```
@@ -530,7 +537,6 @@ Request :
     "address" : "string",
     "region" : "string",
     "postalCode" : "string",
-    "isPrimary" : "boolean",
 }
 ```
 
@@ -666,6 +672,7 @@ Request :
 {
     "rating" : "string",
     "comment" : "string",
+    "picture" : "file"
 }
 ```
 
@@ -676,6 +683,58 @@ Response :
   "message" : "string"
 }
 ```
+
+### List Topups
+
+Request :
+- Method : GET
+- Endpoint : `/customer/topup`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "success": "boolean",
+  "message": "string",
+  "count": "number",
+  "results": [
+      {
+          "id": "integer, PK",
+          "charge": "bigint",
+          "createdAt": "date",
+          "updatedAt": "date"
+      },
+      {
+          "id": "integer, PK",
+          "charge": "bigint",
+          "createdAt": "date",
+          "updatedAt": "date"
+      },
+  ],
+}
+```
+
+### Topup Credit
+
+Request :
+- Method : POST
+- Endpoint : `/customer/topup/{id_topup}`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "success": "boolean",
+  "message": "string",
+  "count": "number",
+  "results": {
+      "saldo": "bigint"
+   }
+}
+```
+
 
 ### Post Shooping Cart
 
@@ -685,6 +744,10 @@ Request :
 - Header :
     - Content-Type: application/json
     - Accept: application/json
+- Query Params :
+    - productColorId : "number"
+    - productImageId : "number"
+    - productSizeId : "number"
 - Body :
 
 ```json 
@@ -697,15 +760,46 @@ Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  "results": {
+        "id": "integer, PK",
+        "storeId": "integer",
+        "categoryId": "integer",
+        "conditionId": "integer",
+        "name": "string",
+        "price": "bigint",
+        "stock": "integer",
+        "description": "string",
+        "createdAt": "date",
+        "updatedAt": "date",
+        "ProductImages": [
+            {
+                "id": "integer, PK",
+                "picture": "string"
+            }
+        ],
+        "ProductColors": [
+            {
+                "id": "integer, PK",
+                "name": "string",
+                "hexa": "string"
+            }
+        ],
+        "ProductSizes": [
+            {
+                "id": "integer, PK",
+                "size": "string"
+            }
+        ]
+    }
 }
 ```
 
-### Update Shooping Cart
+### Checkout Shooping Cart
 
 Request :
-- Method : PATCH/PUT,
-- Endpoint : `/customer/cart/{id_cart}`
+- Method : PUT
+- Endpoint : `/customer/cart/out/{id_cart}`
 - Header :
     - Content-Type: application/json
     - Accept: application/json
@@ -714,7 +808,6 @@ Request :
 ```json 
 {
     "quantity" : "string",
-    "isCheck" : "boolean",
 }
 ```
 
@@ -722,7 +815,27 @@ Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  "results": {
+      "totalPrice": "bigint"
+   }
+}
+```
+
+### Discard Checkout Shooping Cart
+
+Request :
+- Method : PUT
+- Endpoint : `/customer/cart/in`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
 }
 ```
 
@@ -734,11 +847,12 @@ Request :
 - Header :
   -Accept: application/json
 - Query Param : 
-  - search : string,
   - page : number,
   - limit : number,
   - sortBy : string || `createdAt`,
   - sortType : string || `DESC`,
+  - status = "IN" || "OUT" || "ORDER",
+  - noOrder = "string" //only if status ORDER,
 
 Response :
 ```json
@@ -755,110 +869,74 @@ Response :
   "results" : [
     {
       "id" : "integer, PK",
-      "userId" : "integer",
+      "detailProductId" : "integer",
       "productId" : "integer",
       "quantity" : "integer",
       "totalPrice" : "integer",
       "isCheck" : "boolean",
       "status" : "string",
+      "noOrder": "string",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
+      "DetailProduct": {
+                "id": 14,
+                "productId": 16,
+                "productColorId": 61,
+                "productImageId": 17,
+                "productSizeId": 33,
+                "createdAt": "2020-12-11T12:30:50.000Z",
+                "updatedAt": "2020-12-11T12:30:50.000Z",
+                "Product": {
+                    "id": "integer, PK",
+                    "storeId": "integer",
+                    "categoryId": "integer",
+                    "conditionId": "integer",
+                    "name": "string",
+                    "price": "bigint",
+                    "stock": "integer",
+                    "description": "string",
+                    "createdAt": "date",
+                    "updatedAt": "date",
+                },
+                "ProductColor": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                },
+                "ProductSize": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                },
+                "ProductImage": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "picture": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                }
+            }
     }
   ]
 }
 ```
 
-### Checkout Shooping Cart
-
-Request :
-- Method : PUT
-- Endpoint : `/customer/cart/out`
-- Header :
-    - Content-Type: application/json
-    - Accept: application/json
-- Body :
-
-```json 
-{
-    "status" : "out",
-}
-```
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string"
-}
-```
-
-### List Checkout Shooping Cart
-
-Request :
-- Method : GET,
-- Endpoint : `/customer/cart`
-- Header :
-  -Accept: application/json
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "userId" : "integer",
-      "productId" : "integer",
-      "quantity" : "integer",
-      "totalPrice" : "integer",
-      "isCheck" : "boolean",
-      "status" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
-    }
-  ]
-}
-```
-
-### Post Order
+### Order By Credit
 
 Request : 
 - Method : POST
 - Endpoint : `customer/order`
 - Header :
-    - Content-Type: application/json
     - Accept: application/json
-- Body :
-
-```json 
-{
-    "status" : "order",
-    "noOrder" : "string, unique",
-    "noTracking" : "string, unique",
-}
-```
 
 Response :
 ```json
