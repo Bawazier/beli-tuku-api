@@ -1,4 +1,4 @@
-const { UserAddress, User } = require("../../models");
+const { Address, User } = require("../../models");
 const { Op } = require("sequelize");
 const responseStandart = require("../../helper/response");
 const schema = require("../../helper/validation");
@@ -18,7 +18,7 @@ module.exports = {
         sortType = "DESC",
       } = req.query;
       const offset = (page - 1) * limit;
-      const { count, rows } = await UserAddress.findAndCountAll({
+      const { count, rows } = await Address.findAndCountAll({
         include: [{ model: User, attributes: ["name", "picture"] }],
         where: {
           userId: req.user.id,
@@ -60,7 +60,7 @@ module.exports = {
 
   getAddressId: async (req, res) => {
     try {
-      const results = await UserAddress.findByPk(req.params.id);
+      const results = await Address.findByPk(req.params.id);
       if (results) {
         return responseStandart(res, "success to display address", {
           results,
@@ -82,37 +82,30 @@ module.exports = {
   postAddress: async (req, res) => {
     try {
       const result = await addressSchema.required().validateAsync(req.body);
-      await sequelize.transaction(async (t) => {
-        const address = {
-          userId: req.user.id,
-          name: result.name,
-          recipientName: result.recipientName,
-          recipientTlp: result.recipientTlp,
-          address: result.address,
-          region: result.region,
-          postalCode: result.postalCode,
-          isPrimary: 1,
-        };
-        await UserAddress.create(address, {
-          transaction: t,
-        });
-        await UserAddress.update(
-          { isPrimary: 0 },
-          {
-            where: {
-              userId: req.user.id,
-            },
+      const address = {
+        userId: req.user.id,
+        name: result.name,
+        recipientName: result.recipientName,
+        recipientTlp: result.recipientTlp,
+        address: result.address,
+        region: result.region,
+        postalCode: result.postalCode,
+        isPrimary: 1,
+      };
+      await Address.update(
+        { isPrimary: 0 },
+        {
+          where: {
+            userId: req.user.id,
           },
-          {
-            transaction: t,
-          }
-        );
-        return responseStandart(
-          res,
-          "success create your shipping address",
-          {}
-        );
-      });
+        }
+      );
+      await Address.create(address);
+      return responseStandart(
+        res,
+        "success create your shipping address",
+        {}
+      );
     } catch (e) {
       return responseStandart(res, e, {}, 400, false);
     }
@@ -131,7 +124,17 @@ module.exports = {
         postalCode: result.postalCode,
         isPrimary: result.isPrimary ? 1:0,
       };
-      await UserAddress.update(address, {
+      if (result.isPrimary){
+        await Address.update(
+          { isPrimary: 0 },
+          {
+            where: {
+              userId: req.user.id,
+            },
+          }
+        );
+      }
+      await Address.update(address, {
         where: {
           id: req.params.id,
         },
@@ -144,7 +147,7 @@ module.exports = {
 
   deleteAddress: async (req, res) => {
     try {
-      await UserAddress.destroy({
+      await Address.destroy({
         where: {
           id: req.params.id,
         },
