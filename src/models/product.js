@@ -1,391 +1,53 @@
-const db = require('../helper/db');
-const query = require('../helper/sqlQuery');
-
-const tableName = 'products';
-const tableJoin = ['category', 'conditions', 'user'];
-
-const Products = function (products) {
-	this.user_id = products.user_id;
-	this.category_id = products.category_id;
-	this.conditions_id = products.conditions_id;
-	this.name = products.name;
-	this.price = products.price;
-	this.stock = products.stock;
-	this.created_at = products.created_at;
-	this.updated_at = products.updated_at;
-	this.description = products.description;
+"use strict";
+const {
+  Model
+} = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class Product extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      Product.belongsTo(models.Store, {
+        foreignKey: "storeId"
+      });
+      Product.belongsTo(models.Category, {
+        foreignKey: "categoryId"
+      });
+      Product.belongsTo(models.Condition, {
+        foreignKey: "conditionId"
+      });
+      Product.hasMany(models.ProductColor, {
+        foreignKey: "productId"
+      });
+      Product.hasMany(models.ProductImage, {
+        foreignKey: "productId"
+      });
+      Product.hasMany(models.ProductRating, {
+        foreignKey: "productId"
+      });
+      Product.hasMany(models.ProductSize, {
+        foreignKey: "productId"
+      });
+      Product.hasMany(models.DetailProduct, {
+        foreignKey: "productId"
+      });
+    }
+  }
+  Product.init({
+    storeId: DataTypes.INTEGER,
+    categoryId: DataTypes.INTEGER,
+    conditionId: DataTypes.INTEGER,
+    name: DataTypes.STRING,
+    price: DataTypes.BIGINT,
+    stock: DataTypes.INTEGER,
+    description: DataTypes.TEXT
+  }, {
+    sequelize,
+    modelName: "Product",
+  });
+  return Product;
 };
-
-const queryFindBySearch = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
-'AS rating FROM products, product_ratings WHERE ?? LIKE ? GROUP BY products.id';
-const queryFindByCondition = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' +
-'AS rating FROM products, product_ratings WHERE ? GROUP BY products.id';
-const querySortByCreatedAt = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
-'AS rating FROM products, product_ratings GROUP BY products.id ORDER BY created_at ASC';
-const querySortByRatings = 'SELECT products.*, AVG(IF(product_ratings.product_id=products.id, rating, 0))' + 
-'AS rating FROM products, product_ratings GROUP BY products.id ORDER BY rating DESC';
-
-Products.create = (products, result) => {
-	const contents = [
-		tableName,
-		{
-			...products
-		}
-	];
-
-	db.query(query.insert, contents, (err) => {
-		if (!err) {
-			result(null, { ...products });
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.update = (products, id, result) => {
-	const contents = [
-		tableName,
-		{
-			...products
-		},
-		{ id: id },
-	];
-
-	db.query(query.update, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, products);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findById = (id, result) => {
-	const contents = [
-		tableName,
-		{ id: id }
-	];
-
-	db.query(query.findById, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findAll = (result) => {
-	const contents = [
-		tableName
-	];
-
-	db.query(query.findAll, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.delete = (id, result) => {
-	const contents = [
-		tableName,
-		{ id: id }
-	];
-	db.query(query.delete, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-//Custom
-//	START DB FOR HOME ROUTES
-Products.findBySearch = (searchKey, searchValue, result) => {
-	const contents = [
-		searchKey,
-		'%'+searchValue+'%',
-	];
-
-	db.query(queryFindBySearch, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findByCategoryId = (id, result) => {
-	const contents = [
-		{'products.category_id': id}
-	];
-
-	db.query(queryFindByCondition, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findByCreatedAt = (result) => {
-	db.query(querySortByCreatedAt, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findByRatings = (result) => {
-	db.query(querySortByRatings, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-//	END DB FOR HOME ROUTES
-
-//	START DB FOR PROFILE SALLER ROUTES
-Products.findByUserId = (id, result) => {
-	const contents = [
-		{'products.user_id': id}
-	];
-
-	db.query(queryFindByCondition, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.createByUserId = (products, result) => {
-	const contentsValidate = [
-		tableJoin[0],
-		{ id: products.category_id }
-	];
-	const contents = [
-		tableName,
-		{
-			...products
-		}
-	];
-
-	db.query(query.findById, contentsValidate, (err, res) => {
-		if (res.length) {
-			db.query(query.insert, contents, (err) => {
-				if (!err) {
-					result(null, {});
-				} else {
-					result(err, null);
-				}
-			});
-		} else {
-			result('Category is not found', null);
-		}
-	});
-
-};
-
-Products.updateByUserId = (products, id, result) => {
-	const contents = [
-		tableName,
-		{
-			...products
-		},
-		{ id: id, user_id: products.user_id },
-	];
-
-	db.query(query.updateSecondCondition, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, {});
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-//	END DB FOR PROFILE SALLER ROUTES
-
-
-Products.customFindById = (id, result) => {
-	const contents = [
-		[
-			'products.id',
-			'products.user_id',
-			'products.category_id',
-			'products.conditions_id',
-			'products.name',
-			'products.price',
-			'products.stock',
-			'products.maxSize',
-			'products.description',
-			'conditions.status',
-		],
-		tableName,
-		tableJoin[2],
-		'products.user_id',
-		'user.id',
-		tableJoin[0],
-		'products.category_id',
-		'category.id',
-		tableJoin[1],
-		'products.conditions_id',
-		'conditions.id',
-		{'products.id': id}
-	];
-
-	db.query(query.findJoinThirdTable, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.findByPopulerProducts = (offset, limit, searchKey, searchValue, sortBy, sort, id, result) => {
-	const contents = [
-		searchKey,
-		'%'+searchValue+'%',
-		'products.'+sortBy,
-		// sort,
-		limit,
-		offset
-	];
-
-	db.query(query.findPopuler, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-Products.customFindAll = (offset, limit, searchKey, searchValue, sortBy, sort, result) => {
-	const contents = [
-		[
-			'products.id',
-			'products.user_id',
-			'products.category_id',
-			'products.conditions_id',
-			'products.name',
-			'products.price',
-			'products.stock',
-			'products.maxSize',
-			'products.description',
-			'conditions.status',
-		],
-		tableName,
-		tableJoin[2],
-		'products.user_id',
-		'user.id',
-		tableJoin[0],
-		'products.category_id',
-		'category.id',
-		tableJoin[1],
-		'products.conditions_id',
-		'conditions.id',
-		searchKey,
-		'%'+searchValue+'%',
-		'products.'+sortBy,
-		// sort,
-		limit,
-		offset
-	];
-	
-
-	db.query(query.findJoinThirdWithLimit, contents, (err, res) => {
-		if (!err) {
-			if (res.length) {
-				db.query(`SELECT COUNT(*) AS count FROM ${tableName} WHERE ${searchKey} LIKE '%${searchValue}%'`,
-					(err, data) => {
-						result(null, res, data);
-					});
-			} else {
-				result({ kind: 'not_found' }, null, null);
-			}
-		} else {
-			result(err, null, null);
-		}
-	});
-};
-
-Products.deleteByUserId = (id, result) => {
-	const contents = [
-		tableName,
-		{user_id: id}
-	];
-	db.query(query.delete, contents, (err, res) => {
-		if (!err) {
-			if (res.affectedRows != 0) {
-				result(null, res);
-			} else {
-				result({ kind: 'not_found' }, null);
-			}
-		} else {
-			result(err, null);
-		}
-	});
-};
-
-module.exports = Products;

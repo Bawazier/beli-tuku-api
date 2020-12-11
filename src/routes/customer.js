@@ -1,27 +1,33 @@
-const router = require('express').Router();
-const profile = require('../controllers/profile');
-const cart = require('../controllers/cart');
-const address = require('../controllers/address');
-const ratings = require('../controllers/ratings');
+const router = require("express").Router();
+const auth = require("../controllers/Auth/auth");
+const profile = require("../controllers/Customer/profile");
+const address = require("../controllers/Customer/address");
+const transaction = require("../controllers/Customer/transaction");
+const rating = require("../controllers/Customer/rating");
 
-router.get('/profile/account', profile.findAccountById);
-router.patch('/profile/account', profile.updateAccountById);
-router.put('/profile/account', profile.updateAccountAllById);
+router.get("/account", profile.getUser);
+router.patch("/account", profile.patchUser);
+router.put("/account", profile.putUser);
+router.put("/change/pass", auth.changePass);
 
-router.get('/profile/address', address.findAddressByUserId);
-router.post('/profile/address', address.createAddressByUserId);
-router.patch('/profile/address/:id', address.updateAddressByUserId);
-router.put('/profile/address/:id', address.updateAddressAllByUserId);
-router.put('/profile/address/primary/:id', address.updatePrimaryAddress);
+router.post("/address", address.postAddress);
+router.patch("/address/:id", address.patchAddress);
+router.get("/address/:id", address.getAddressId);
+router.get("/address", address.listAddress);
+router.delete("/address/:id", address.deleteAddress);
 
-router.get('/cart/in', cart.findByStatusIn);
-router.get('/cart/out', cart.findByStatusOut);
-router.post('/cart/product/:id', cart.addCart);
-router.patch('/cart/in/:id', cart.createCart);
-router.patch('/cart/out/', cart.chekOut);
+router.post("/rating/product/:id", rating.postRating);
 
-router.get('/ratings/user', ratings.findByUserId);
-router.post('/ratings/product/:id', ratings.createRatings);
-router.patch('/ratings/product/:id', ratings.updateRatings);
+router.get("/topup", transaction.listTopup);
+router.post("/topup/:id", transaction.topupCredit);
+
+router.post("/cart/:id", transaction.addProductToCart);
+router.get("/cart", transaction.listCart);
+router.put("/cart/out/:id", transaction.checkOutCart);
+router.put("/cart/in/", transaction.discardCheckoutCart);
+
+router.post("/order", transaction.orderByCredit);
+router.get("/order/:id", transaction.detailOrder);
+router.get("/order", transaction.listOrder);
 
 module.exports = router;
