@@ -148,6 +148,15 @@ Request :
   - limit : number,
   - sortBy : string || `createdAt`,
   - sortType : string || `DESC`,
+  - searchColor : string,
+  - searchSize : string,
+  - searchStore : string,
+  - searchCategory : string,
+  - color : array,
+  - size : array,
+  - store : array,
+  - category : array,
+  - status : array,
 
 Response :
 ```json
@@ -157,7 +166,8 @@ Response :
   "pageInfo" : {
     "count" : "number",
     "pages" : "number",
-    "limit" : "number",
+    "currentPage" : "number",
+    "dataPerPage" : "number,
     "nextLink" : "string",
     "prevLink" : "string",
   },
@@ -183,65 +193,45 @@ Response :
       "description" : "string",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    }
-  ]
-}
-```
-
-### List Popular Products
-
-Request :
-- Method : GET
-- Endpoint : `/public/popular/products`
-- Header :
-  - Accept: application/json
-- Query Param : 
-  - search : string,
-  - page : number,
-  - limit : number,
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    },
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
+      "Condition" : {"id" : "integer", "status" : "string"},
+      "Category" : {"id" : "integer", "name" : "string"},
+      "Store" : {"id" : "integer", "name" : "string", "description" : "string"},
+      "ProductColors": [
+                {
+                    "id": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "available" || "empty",
+                    "isPrimary": "boolean"
+                },
+                {
+                    "id": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "available" || "empty",
+                    "isPrimary": "boolean"
+                },
+            ],
+      "ProductSizes": [
+                {
+                    "id": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean"
+                },
+                {
+                    "id": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean"
+                },
+            ],
+      "ProductImages": [
+                {
+                    "id": "integer",
+                    "picture": "string, path",
+                    "isPrimary": "true"
+                }
+            ],
+      "ratings" : "number"
     }
   ]
 }
@@ -267,7 +257,8 @@ Response :
   "pageInfo" : {
     "count" : "number",
     "pages" : "number",
-    "limit" : "number",
+    "currentPage" : "number",
+    "dataPerPage" : "number,
     "nextLink" : "string",
     "prevLink" : "string",
   },
@@ -288,63 +279,6 @@ Response :
       "createdAt" : "date",
       "updatedAt" : "date"
     },
-  ]
-}
-```
-
-### List Products By Categories
-
-Request :
-- Method : GET
-- Endpoint : `/public/products/categories/{id_category}`
-- Header :
-  - Accept: application/json
-- Query Param : 
-  - search : string,
-  - page : number,
-  - limit : number,
-  - sortBy : string || `createdAt`,
-  - sortType : string || `DESC`,
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    },
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    }
   ]
 }
 ```
@@ -362,7 +296,8 @@ Response :
 {
   "status" : "boolean",
   "message" : "string",
-  "results" : {
+  "results" : [
+    {
       "id" : "integer, PK",
       "name" : "string",
       "price" : "integer",
@@ -370,47 +305,120 @@ Response :
       "description" : "string",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "Category" : {"status" : "name"},
       "Condition" : {"status" : "string"},
       "User" : {"name" : "string", "picture" : "string"},
-      "Image" : [
-        {
-          "id" : "integer, Pk",
-          "picture" : "string",
-          "isPrimary" : "boolean"
-        },
-        {
-          "id" : "integer, Pk",
-          "picture" : "string",
-          "isPrimary" : "boolean"
-        }
-      ],
-      "Color" : [
-        {
-          "id" : "integer, Pk",
-          "hexa" : "string"
-        },
-        {
-          "id" : "integer, Pk",
-          "hexa" : "string"
-        }
-      ],
-      "Ratings" : [
-        {
-          "id" : "integer, Pk",
-          "userId" : "integer",
-          "rating" : "integer",
-          "comment" : "string",
-        },
-        {
-          "id" : "integer, Pk",
-          "userId" : "integer",
-          "rating" : "integer",
-          "comment" : "string",
-        }
-      ],
+      "Image" : {"picture" : "string"},
       "Rating" : "number"
-  }
+    },
+    {
+      "id" : "integer, PK",
+      "name" : "string",
+      "price" : "integer",
+      "stock" : "integer",
+      "description" : "string",
+      "createdAt" : "date",
+      "updatedAt" : "date",
+      "Condition" : {"id" : "integer", "status" : "string"},
+      "Category" : {"id" : "integer", "name" : "string"},
+      "Store" : {"id" : "integer", "name" : "string", "description" : "string"},
+      "ProductColors": [
+                {
+                    "id": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "available" || "empty",
+                    "isPrimary": "boolean"
+                },
+                {
+                    "id": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "available" || "empty",
+                    "isPrimary": "boolean"
+                },
+            ],
+      "ProductSizes": [
+                {
+                    "id": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean"
+                },
+                {
+                    "id": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean"
+                },
+            ],
+      "ProductImages": [
+                {
+                    "id": "integer",
+                    "picture": "string, path",
+                    "isPrimary": "boolean"
+                }
+            ],
+      "ratings" : "number"
+    }
+  ]
+}
+```
+
+### Get Details Product Reviews
+
+Request :
+- Method : GET
+- Endpoint : `/public/product/reviews/{id_product}`
+- Header :
+  - Accept: application/json
+- Query Param : 
+  - search : string,
+  - page : number,
+  - limit : number,
+  - sortBy : string || `createdAt`,
+  - sortType : string || `DESC`,
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
+  "pageInfo" : {
+      "count" : "number",
+      "pages" : "number",
+      "currentPage" : "number",
+      "dataPerPage" : "number,
+      "nextLink" : "string",
+      "prevLink" : "string",
+    },
+  "results": [
+        {
+            "id": "integer",
+            "productId": "integer",
+            "userId": "integer",
+            "rating": "integer",
+            "comment": "string",
+            "createdAt": "date",
+            "updatedAt": "date",
+            "RatingImages": [
+                {
+                    "id": "integer",
+                    "picture": "string"
+                },
+                {
+                    "id": "integer",
+                    "picture": "string"
+                },
+                {
+                    "id": "integer",
+                    "picture": "string"
+                }
+            ],
+            "User": {
+                "id": "integer",
+                "name": "string",
+                "picture": "string"
+            }
+        }
+    ]
 }
 ```
 
@@ -435,7 +443,7 @@ Request :
 {
     "oldPassword" : "string",
     "newPassword" : "string",
-    "confirmPassword" : "string",
+    "confirmNewPassword" : "string",
 }
 ```
 
@@ -471,6 +479,13 @@ Response :
     "createdAt" : "date",
     "updatedAt" : "date",
     "URL_picture" : "string",
+    "Credit": {
+                "id": "integer",
+                "userId": "integer",
+                "saldo": "integer",
+                "createdAt": "date",
+                "updatedAt": "date"
+            },
   }
 }
 ```
@@ -522,7 +537,6 @@ Request :
     "address" : "string",
     "region" : "string",
     "postalCode" : "string",
-    "isPrimary" : "boolean",
 }
 ```
 
@@ -658,6 +672,7 @@ Request :
 {
     "rating" : "string",
     "comment" : "string",
+    "picture" : "file"
 }
 ```
 
@@ -668,6 +683,58 @@ Response :
   "message" : "string"
 }
 ```
+
+### List Topups
+
+Request :
+- Method : GET
+- Endpoint : `/customer/topup`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "success": "boolean",
+  "message": "string",
+  "count": "number",
+  "results": [
+      {
+          "id": "integer, PK",
+          "charge": "bigint",
+          "createdAt": "date",
+          "updatedAt": "date"
+      },
+      {
+          "id": "integer, PK",
+          "charge": "bigint",
+          "createdAt": "date",
+          "updatedAt": "date"
+      },
+  ],
+}
+```
+
+### Topup Credit
+
+Request :
+- Method : POST
+- Endpoint : `/customer/topup/{id_topup}`
+- Header :
+  - Accept: application/json
+
+Response :
+```json
+{
+  "success": "boolean",
+  "message": "string",
+  "count": "number",
+  "results": {
+      "saldo": "bigint"
+   }
+}
+```
+
 
 ### Post Shooping Cart
 
@@ -677,6 +744,10 @@ Request :
 - Header :
     - Content-Type: application/json
     - Accept: application/json
+- Query Params :
+    - productColorId : "number"
+    - productImageId : "number"
+    - productSizeId : "number"
 - Body :
 
 ```json 
@@ -689,15 +760,46 @@ Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  "results": {
+        "id": "integer, PK",
+        "storeId": "integer",
+        "categoryId": "integer",
+        "conditionId": "integer",
+        "name": "string",
+        "price": "bigint",
+        "stock": "integer",
+        "description": "string",
+        "createdAt": "date",
+        "updatedAt": "date",
+        "ProductImages": [
+            {
+                "id": "integer, PK",
+                "picture": "string"
+            }
+        ],
+        "ProductColors": [
+            {
+                "id": "integer, PK",
+                "name": "string",
+                "hexa": "string"
+            }
+        ],
+        "ProductSizes": [
+            {
+                "id": "integer, PK",
+                "size": "string"
+            }
+        ]
+    }
 }
 ```
 
-### Update Shooping Cart
+### Checkout Shooping Cart
 
 Request :
-- Method : PATCH/PUT,
-- Endpoint : `/customer/cart/{id_cart}`
+- Method : PUT
+- Endpoint : `/customer/cart/out/{id_cart}`
 - Header :
     - Content-Type: application/json
     - Accept: application/json
@@ -706,7 +808,6 @@ Request :
 ```json 
 {
     "quantity" : "string",
-    "isCheck" : "boolean",
 }
 ```
 
@@ -714,7 +815,27 @@ Response :
 ```json
 {
   "status" : "boolean",
-  "message" : "string"
+  "message" : "string",
+  "results": {
+      "totalPrice": "bigint"
+   }
+}
+```
+
+### Discard Checkout Shooping Cart
+
+Request :
+- Method : PUT
+- Endpoint : `/customer/cart/in`
+- Header :
+    - Content-Type: application/json
+    - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string",
 }
 ```
 
@@ -726,11 +847,12 @@ Request :
 - Header :
   -Accept: application/json
 - Query Param : 
-  - search : string,
   - page : number,
   - limit : number,
   - sortBy : string || `createdAt`,
   - sortType : string || `DESC`,
+  - status = "IN" || "OUT" || "ORDER",
+  - noOrder = "string" //only if status ORDER,
 
 Response :
 ```json
@@ -738,119 +860,84 @@ Response :
   "status" : "boolean",
   "message" : "string",
   "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
+      "count" : "number",
+      "pages" : "number",
+      "currentPage" : "number",
+      "dataPerPage" : "number,
+      "nextLink" : "string",
+      "prevLink" : "string",
+    },
   "results" : [
     {
       "id" : "integer, PK",
-      "userId" : "integer",
+      "detailProductId" : "integer",
       "productId" : "integer",
       "quantity" : "integer",
       "totalPrice" : "integer",
       "isCheck" : "boolean",
       "status" : "string",
+      "noOrder": "string",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
+      "DetailProduct": {
+                "id": 14,
+                "productId": 16,
+                "productColorId": 61,
+                "productImageId": 17,
+                "productSizeId": 33,
+                "createdAt": "2020-12-11T12:30:50.000Z",
+                "updatedAt": "2020-12-11T12:30:50.000Z",
+                "Product": {
+                    "id": "integer, PK",
+                    "storeId": "integer",
+                    "categoryId": "integer",
+                    "conditionId": "integer",
+                    "name": "string",
+                    "price": "bigint",
+                    "stock": "integer",
+                    "description": "string",
+                    "createdAt": "date",
+                    "updatedAt": "date",
+                },
+                "ProductColor": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "name": "string",
+                    "hexa": "string",
+                    "status": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                },
+                "ProductSize": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "size": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                },
+                "ProductImage": {
+                    "id": "integer, PK",
+                    "productId": "integer",
+                    "picture": "string",
+                    "isPrimary": "boolean",
+                    "createdAt": "date",
+                    "updatedAt": "date"
+                }
+            }
     }
   ]
 }
 ```
 
-### Checkout Shooping Cart
-
-Request :
-- Method : PUT
-- Endpoint : `/customer/cart/out`
-- Header :
-    - Content-Type: application/json
-    - Accept: application/json
-- Body :
-
-```json 
-{
-    "status" : "out",
-}
-```
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string"
-}
-```
-
-### List Checkout Shooping Cart
-
-Request :
-- Method : GET,
-- Endpoint : `/customer/cart`
-- Header :
-  -Accept: application/json
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "userId" : "integer",
-      "productId" : "integer",
-      "quantity" : "integer",
-      "totalPrice" : "integer",
-      "isCheck" : "boolean",
-      "status" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
-    }
-  ]
-}
-```
-
-### Post Order
+### Order By Credit
 
 Request : 
 - Method : POST
 - Endpoint : `customer/order`
 - Header :
-    - Content-Type: application/json
     - Accept: application/json
-- Body :
-
-```json 
-{
-    "status" : "order",
-    "noOrder" : "string, unique",
-    "noTracking" : "string, unique",
-}
-```
 
 Response :
 ```json
@@ -907,7 +994,6 @@ Request :
 - Header :
     - Accept: application/json
 - Query Param : 
-  - search : string,
   - page : number,
   - limit : number,
   - sortBy : string || `createdAt`,
@@ -919,12 +1005,13 @@ Response :
   "status" : "boolean",
   "message" : "string",
   "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
+      "count" : "number",
+      "pages" : "number",
+      "currentPage" : "number",
+      "dataPerPage" : "number,
+      "nextLink" : "string",
+      "prevLink" : "string",
+    },
   "results" : [
     {
       "userId" : "integer",
@@ -937,59 +1024,7 @@ Response :
       "delivery" : "integer",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "quantity" : "integer",
-      "Address" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "recipientName" : "string",
-        "recipientTlp" : "string",
-        "address" : "string",
-        "region" : "string",
-        "postalCode" : "string",
-        "isPrimary" : "boolean",
-      }
-    }
-  ]
-}
-```
-
-### List Order Shooping Cart
-
-Request :
-- Method : GET,
-- Endpoint : `/customer/cart`
-- Header :
-  -Accept: application/json
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "userId" : "integer",
-      "productId" : "integer",
-      "quantity" : "integer",
-      "totalPrice" : "integer",
-      "isCheck" : "boolean",
-      "status" : "string",
-      "noOrder" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
+      "Quantity" : "integer",
     }
   ]
 }
