@@ -860,12 +860,13 @@ Response :
   "status" : "boolean",
   "message" : "string",
   "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
+      "count" : "number",
+      "pages" : "number",
+      "currentPage" : "number",
+      "dataPerPage" : "number,
+      "nextLink" : "string",
+      "prevLink" : "string",
+    },
   "results" : [
     {
       "id" : "integer, PK",
@@ -993,7 +994,6 @@ Request :
 - Header :
     - Accept: application/json
 - Query Param : 
-  - search : string,
   - page : number,
   - limit : number,
   - sortBy : string || `createdAt`,
@@ -1005,12 +1005,13 @@ Response :
   "status" : "boolean",
   "message" : "string",
   "pageInfo" : {
-    "count" : "number",
-    "pages" : "number",
-    "limit" : "number",
-    "nextLink" : "string",
-    "prevLink" : "string",
-  },
+      "count" : "number",
+      "pages" : "number",
+      "currentPage" : "number",
+      "dataPerPage" : "number,
+      "nextLink" : "string",
+      "prevLink" : "string",
+    },
   "results" : [
     {
       "userId" : "integer",
@@ -1023,59 +1024,7 @@ Response :
       "delivery" : "integer",
       "createdAt" : "date",
       "updatedAt" : "date",
-      "quantity" : "integer",
-      "Address" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "recipientName" : "string",
-        "recipientTlp" : "string",
-        "address" : "string",
-        "region" : "string",
-        "postalCode" : "string",
-        "isPrimary" : "boolean",
-      }
-    }
-  ]
-}
-```
-
-### List Order Shooping Cart
-
-Request :
-- Method : GET,
-- Endpoint : `/customer/cart`
-- Header :
-  -Accept: application/json
-
-Response :
-```json
-{
-  "status" : "boolean",
-  "message" : "string",
-  "pageInfo" : {
-    "count" : "number",
-  },
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "userId" : "integer",
-      "productId" : "integer",
-      "quantity" : "integer",
-      "totalPrice" : "integer",
-      "isCheck" : "boolean",
-      "status" : "string",
-      "noOrder" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Product" : {
-        "id" : "integer, PK",
-        "name" : "string",
-        "price" : "integer",
-        "stock" : "integer",
-        "description" : "string",
-        "createdAt" : "date",
-        "updatedAt" : "date",
-      }
+      "Quantity" : "integer",
     }
   ]
 }
