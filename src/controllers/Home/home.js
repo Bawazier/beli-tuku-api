@@ -31,7 +31,8 @@ module.exports = {
         searchStore = "",
         category = [],
         searchCategory = "",
-        status = "New",
+        status = [],
+        searchStatus = "",
       } = req.query;
       const offset = (page - 1) * limit;
       const { count, rows } = await Product.findAndCountAll({
@@ -39,7 +40,9 @@ module.exports = {
           {
             model: Condition,
             attributes: ["id", "status"],
-            where: { status: status },
+            where: { status: status.length
+                ? status
+                : { [Op.substring]: searchStatus }, },
           },
           {
             model: Category,
