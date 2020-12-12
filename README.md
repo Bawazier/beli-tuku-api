@@ -152,6 +152,7 @@ Request :
   - searchSize : string,
   - searchStore : string,
   - searchCategory : string,
+  - searchStatus : string,
   - color : array,
   - size : array,
   - store : array,
@@ -172,19 +173,6 @@ Response :
     "prevLink" : "string",
   },
   "results" : [
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    },
     {
       "id" : "integer, PK",
       "name" : "string",
@@ -296,21 +284,7 @@ Response :
 {
   "status" : "boolean",
   "message" : "string",
-  "results" : [
-    {
-      "id" : "integer, PK",
-      "name" : "string",
-      "price" : "integer",
-      "stock" : "integer",
-      "description" : "string",
-      "createdAt" : "date",
-      "updatedAt" : "date",
-      "Condition" : {"status" : "string"},
-      "User" : {"name" : "string", "picture" : "string"},
-      "Image" : {"picture" : "string"},
-      "Rating" : "number"
-    },
-    {
+  "results" : {
       "id" : "integer, PK",
       "name" : "string",
       "price" : "integer",
@@ -358,7 +332,6 @@ Response :
             ],
       "ratings" : "number"
     }
-  ]
 }
 ```
 
@@ -432,7 +405,7 @@ Request :
 
 ### Change Password
 
-- Method : POST
+- Method : c
 - Endpoint : `/customer/change/password`
 - Header : 
   - Content-Type: application/json
