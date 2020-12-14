@@ -11,7 +11,7 @@ const userSchema = schema.User;
 module.exports = {
   getUser: async (req, res) => {
     try {
-      const data = await User.findAll({
+      const results = await User.findByPk(req.user.id, {
         attributes: [
           "id",
           "name",
@@ -23,13 +23,6 @@ module.exports = {
           "createdAt",
         ],
         include: [Credit],
-        where: {
-          id: req.user.id,
-        },
-      });
-      const results = data.map((item) => {
-        const picture = { URL_picture: process.env.APP_URL + item.picture };
-        return Object.assign({}, item.dataValues, picture);
       });
       return responseStandart(res, "success display user data", {
         results,
