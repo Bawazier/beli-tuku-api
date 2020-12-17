@@ -22,6 +22,7 @@ router.get("/topup", transaction.listTopup);
 router.post("/topup/:id", transaction.topupCredit);
 
 router.post("/cart/:id", transaction.addProductToCart);
+router.delete("/cart/:id", transaction.deleteCart);
 router.get("/cart", transaction.listCart);
 router.put("/cart/out/:id", transaction.checkOutCart);
 router.put("/cart/in/", transaction.discardCheckoutCart);

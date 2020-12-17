@@ -125,6 +125,19 @@ module.exports = {
     return responseStandart(res, "add product to cart success", { results });
   },
 
+  deleteCart: async (req, res) => {
+    try {
+      await Cart.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+      return responseStandart(res, "delete cart success");
+    }catch(e){
+      return responseStandart(res, e, {}, 500, false);
+    }
+  },
+
   checkOutCart: async (req, res) => {
     const results = await sequelize.transaction(async (t) => {
       try {
