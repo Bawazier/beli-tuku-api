@@ -168,7 +168,7 @@ Response :
     "count" : "number",
     "pages" : "number",
     "currentPage" : "number",
-    "dataPerPage" : "number,
+    "dataPerPage" : "number",
     "nextLink" : "string",
     "prevLink" : "string",
   },
@@ -246,7 +246,7 @@ Response :
     "count" : "number",
     "pages" : "number",
     "currentPage" : "number",
-    "dataPerPage" : "number,
+    "dataPerPage" : "number",
     "nextLink" : "string",
     "prevLink" : "string",
   },
@@ -358,7 +358,7 @@ Response :
       "count" : "number",
       "pages" : "number",
       "currentPage" : "number",
-      "dataPerPage" : "number,
+      "dataPerPage" : "number",
       "nextLink" : "string",
       "prevLink" : "string",
     },
@@ -768,6 +768,22 @@ Response :
 }
 ```
 
+### Delete Cart
+
+Request :
+- Method : DELETE
+- Endpoint : `/customer/cart/{id_product}`
+- Header :
+    - Accept: application/json
+
+Response :
+```json
+{
+  "status" : "boolean",
+  "message" : "string"
+}
+```
+
 ### Checkout Shooping Cart
 
 Request :
@@ -836,7 +852,7 @@ Response :
       "count" : "number",
       "pages" : "number",
       "currentPage" : "number",
-      "dataPerPage" : "number,
+      "dataPerPage" : "number",
       "nextLink" : "string",
       "prevLink" : "string",
     },
@@ -981,7 +997,7 @@ Response :
       "count" : "number",
       "pages" : "number",
       "currentPage" : "number",
-      "dataPerPage" : "number,
+      "dataPerPage" : "number",
       "nextLink" : "string",
       "prevLink" : "string",
     },
